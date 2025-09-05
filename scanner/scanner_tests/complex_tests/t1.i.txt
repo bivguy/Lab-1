@@ -1,0 +1,4 @@
+  loadI 10a => r1
+  storeabc
+  load  r1 => r1
+    addI r1,ra2 => rb3

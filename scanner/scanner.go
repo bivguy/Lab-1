@@ -76,6 +76,7 @@ func (s *scanner) NextToken() (token, error) {
 
 		// If there is no new line to process but we did not reach the end of the file, return an error
 		if err != nil && err != io.EOF {
+			s.lineEnd = true
 			return token{category: INVALID, lexeme: ""}, err
 		}
 	}
@@ -96,12 +97,13 @@ func (s *scanner) NextToken() (token, error) {
 	case c == 'l':
 		c, err = s.next()
 		if err != nil {
+			s.lineEnd = true
 			return token{category: INVALID, lexeme: ""}, err
 		}
 		switch {
 		// if the next letter is an o, it must be load or loadI
 		case c == 'o':
-			category, _ = s.loadHelper()
+			category, err = s.loadHelper()
 		// if the next letter is an s, it must be lshift
 		case c == 's':
 			category, err = s.lshiftHelper()
@@ -118,6 +120,7 @@ func (s *scanner) NextToken() (token, error) {
 	case c == 's':
 		c, err = s.next()
 		if err != nil {
+			s.lineEnd = true
 			return token{category: INVALID, lexeme: ""}, err
 		}
 		switch {
@@ -145,6 +148,7 @@ func (s *scanner) NextToken() (token, error) {
 	case c == '/':
 		category, err = s.commentHelper()
 		if err != nil {
+			s.lineEnd = true
 			return token{category: INVALID, lexeme: ""}, err
 		}
 
@@ -153,6 +157,7 @@ func (s *scanner) NextToken() (token, error) {
 	case c == 'r':
 		c, err = s.next()
 		if err != nil {
+			s.lineEnd = true
 			return token{category: INVALID, lexeme: ""}, err
 		}
 
@@ -171,6 +176,10 @@ func (s *scanner) NextToken() (token, error) {
 		} else {
 			err = errors.New("unrecognized instruction: " + string(c))
 		}
+	}
+
+	if err != nil {
+		s.lineEnd = true
 	}
 
 	lexeme = s.lineText[s.startIdx : s.curIdx+1]

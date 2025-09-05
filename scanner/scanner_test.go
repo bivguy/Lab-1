@@ -3,6 +3,7 @@ package scanner
 import (
 	"os"
 	"testing"
+	"time"
 )
 
 type TestCase struct {
@@ -10,6 +11,12 @@ type TestCase struct {
 	input          string
 	expectedTokens []token
 	expectedError  bool
+}
+
+type PerformanceTestCase struct {
+	description   string
+	input         string
+	MaximumTimeMs int64
 }
 
 var simpleTestCases = []TestCase{
@@ -282,6 +289,14 @@ var complexTestCases = []TestCase{
 	},
 }
 
+var performanceTestCases = []PerformanceTestCase{
+	{
+		description:   "Performance Test 1",
+		input:         "scanner_tests/complex_tests/t128k.i.txt",
+		MaximumTimeMs: 200,
+	},
+}
+
 func TestSimpleScannerTestCases(t *testing.T) {
 	for _, tc := range simpleTestCases {
 		t.Run(tc.description, func(t *testing.T) {
@@ -296,6 +311,39 @@ func TestComplexScannerTestCases(t *testing.T) {
 			runTest(tc, t)
 		})
 	}
+}
+
+func TestScannerPerformance(t *testing.T) {
+	for _, tc := range performanceTestCases {
+		t.Run(tc.description, func(t *testing.T) {
+			start := time.Now()
+
+			file, err := os.Open(tc.input)
+			if err != nil {
+				t.Fatalf("Failed to open file: %v", err)
+			}
+			defer file.Close()
+
+			scanner := New(file)
+
+			for {
+				tok, err := scanner.NextToken()
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+					break
+				}
+				if tok.category == EOF {
+					break
+				}
+			}
+
+			duration := time.Since(start)
+			if duration.Milliseconds() > tc.MaximumTimeMs {
+				t.Errorf("Performance test failed: took %d ms, expected maximum %d ms", duration.Milliseconds(), tc.MaximumTimeMs)
+			}
+		})
+	}
+
 }
 
 func runTest(tc TestCase, t *testing.T) {
