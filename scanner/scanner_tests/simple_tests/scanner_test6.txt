@@ -1,0 +1,2 @@
+store r02 => r13204
+output 0
