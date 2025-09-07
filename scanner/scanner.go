@@ -180,6 +180,7 @@ func (s *scanner) NextToken() (token, error) {
 
 	if err != nil {
 		s.lineEnd = true
+		// return token{category: category, lexeme: ""}, err
 	}
 
 	lexeme = s.lineText[s.startIdx : s.curIdx+1]

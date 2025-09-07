@@ -120,9 +120,58 @@ var simpleTestCases = []TestCase{
 		},
 		expectedError: false,
 	},
+	{
+		description: "scanner input with some invalid tokens",
+		input:       "scanner_tests/simple_tests/scanner_test8.txt",
+		expectedTokens: []token{
+			{category: INVALID, lexeme: "storei"},
+			{category: INVALID, lexeme: "30c"},
+			{category: EOF, lexeme: ""},
+		},
+		expectedError: true,
+	},
+	{
+		description: "scanner input with some invalid token at the end of the file",
+		input:       "scanner_tests/simple_tests/scanner_test9.txt",
+		expectedTokens: []token{
+			{category: MEMOP, lexeme: "load"},
+			{category: INVALID, lexeme: "a"},
+			{category: EOF, lexeme: ""},
+		},
+		expectedError: true,
+	},
 }
 
 var complexTestCases = []TestCase{
+	{
+		description: "t1.i",
+		input:       "scanner_tests/complex_tests/t1.i.txt",
+		expectedTokens: []token{
+			{category: COMMENT, lexeme: "//"},
+			{category: COMMENT, lexeme: "//"},
+			{category: COMMENT, lexeme: "//"},
+			{category: COMMENT, lexeme: "//"},
+
+			{category: LOADI, lexeme: "loadI"},
+			{category: INVALID, lexeme: "10a"},
+
+			{category: INVALID, lexeme: "storea"},
+
+			{category: MEMOP, lexeme: "load"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r1"},
+
+			{category: EOL, lexeme: "\n"},
+
+			{category: COMMENT, lexeme: "//"},
+			{category: COMMENT, lexeme: "//"},
+
+			{category: INVALID, lexeme: "addI"},
+			{category: EOF, lexeme: ""},
+		},
+		expectedError: true,
+	},
 	{
 		description: "t2.i",
 		input:       "scanner_tests/complex_tests/t2.i.txt",
@@ -213,6 +262,227 @@ var complexTestCases = []TestCase{
 			{category: CONSTANT, lexeme: "1024"},
 			{category: EOL, lexeme: "\n"},
 			// nop
+			{category: NOP, lexeme: "nop"},
+			{category: EOL, lexeme: "\n"},
+			// Final EOF
+			{category: EOF, lexeme: ""},
+		},
+		expectedError: false,
+	},
+	{
+		description: "t7.i",
+		input:       "scanner_tests/complex_tests/t7.i.txt",
+		expectedTokens: []token{
+			// loadI 20 => r1
+			{category: LOADI, lexeme: "loadI"},
+			{category: CONSTANT, lexeme: "20"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: EOL, lexeme: "\n"},
+
+			// load  r1 => r2
+			{category: MEMOP, lexeme: "load"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r2"},
+			{category: EOL, lexeme: "\n"},
+
+			// loadI r24 => r3
+			{category: LOADI, lexeme: "loadI"},
+			{category: REGISTER, lexeme: "r24"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r3"},
+			{category: EOL, lexeme: "\n"},
+
+			// load  r3 => r4
+			{category: MEMOP, lexeme: "load"},
+			{category: REGISTER, lexeme: "r3"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r4"},
+			{category: EOL, lexeme: "\n"},
+
+			// add   r2, 3 => r4
+			{category: ARITHOP, lexeme: "add"},
+			{category: REGISTER, lexeme: "r2"},
+			{category: COMMA, lexeme: ","},
+			{category: CONSTANT, lexeme: "3"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r4"},
+			{category: EOL, lexeme: "\n"},
+
+			// mult  r1, r2 =>5
+			{category: ARITHOP, lexeme: "mult"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: COMMA, lexeme: ","},
+			{category: REGISTER, lexeme: "r2"},
+			{category: INTO, lexeme: "=>"},
+			{category: CONSTANT, lexeme: "5"},
+			{category: EOL, lexeme: "\n"},
+
+			// add   r4, => r6
+			{category: ARITHOP, lexeme: "add"},
+			{category: REGISTER, lexeme: "r4"},
+			{category: COMMA, lexeme: ","},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r6"},
+			{category: EOL, lexeme: "\n"},
+
+			// store r6 =>
+			{category: MEMOP, lexeme: "store"},
+			{category: REGISTER, lexeme: "r6"},
+			{category: INTO, lexeme: "=>"},
+			{category: EOL, lexeme: "\n"},
+
+			// output 20
+			{category: OUTPUT, lexeme: "output"},
+			{category: CONSTANT, lexeme: "20"},
+
+			// EOF
+			{category: EOL, lexeme: "\n"},
+			{category: EOF, lexeme: ""},
+		},
+		expectedError: false,
+	},
+	{
+		description: "t9.i",
+		input:       "scanner_tests/complex_tests/t9.i.txt",
+		expectedTokens: []token{
+			// loadI 20=>r1
+			{category: LOADI, lexeme: "loadI"},
+			{category: CONSTANT, lexeme: "20"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: EOL, lexeme: "\n"},
+
+			// load r1=>r2
+			{category: MEMOP, lexeme: "load"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r2"},
+			{category: EOL, lexeme: "\n"},
+
+			// mult  r1,r2 => r3 r4
+			{category: ARITHOP, lexeme: "mult"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: COMMA, lexeme: ","},
+			{category: REGISTER, lexeme: "r2"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r3"},
+			{category: REGISTER, lexeme: "r4"},
+			{category: EOL, lexeme: "\n"},
+
+			// mult  r1,r2 => r3 a
+			{category: ARITHOP, lexeme: "mult"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: COMMA, lexeme: ","},
+			{category: REGISTER, lexeme: "r2"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r3"},
+			{category: INVALID, lexeme: "a "},
+
+			// store r3 => r1
+			{category: MEMOP, lexeme: "store"},
+			{category: REGISTER, lexeme: "r3"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: EOL, lexeme: "\n"},
+
+			// output 20
+			{category: OUTPUT, lexeme: "output"},
+			{category: CONSTANT, lexeme: "20"},
+			{category: EOL, lexeme: "\n"},
+
+			// EOF
+			{category: EOL, lexeme: "\n"},
+			{category: EOF, lexeme: ""},
+		},
+		expectedError: true,
+	},
+	{
+		description: "t12.i",
+		input:       "scanner_tests/complex_tests/t12.i.txt",
+		expectedTokens: []token{
+			//   loadI 27  => r1
+			{category: LOADI, lexeme: "loadI"},
+			{category: CONSTANT, lexeme: "27"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: EOL, lexeme: "\n"},
+			//   loadI 27=>r1
+			{category: LOADI, lexeme: "loadI"},
+			{category: CONSTANT, lexeme: "27"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: EOL, lexeme: "\n"},
+			//   load  r1 => r2
+			{category: MEMOP, lexeme: "load"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r2"},
+			{category: EOL, lexeme: "\n"},
+			//   load  r1 => r2
+			{category: MEMOP, lexeme: "load"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r2"},
+			{category: EOL, lexeme: "\n"},
+			//   load  r1 =>r2
+			{category: MEMOP, lexeme: "load"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r2"},
+			{category: EOL, lexeme: "\n"},
+			//   store r2 => r4
+			{category: MEMOP, lexeme: "store"},
+			{category: REGISTER, lexeme: "r2"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r4"},
+			{category: EOL, lexeme: "\n"},
+			//   add   r1,r2 => r3
+			{category: ARITHOP, lexeme: "add"},
+			{category: REGISTER, lexeme: "r1"},
+			{category: COMMA, lexeme: ","},
+			{category: REGISTER, lexeme: "r2"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r3"},
+			{category: EOL, lexeme: "\n"},
+			//   sub   r3, r4 => r5
+			{category: ARITHOP, lexeme: "sub"},
+			{category: REGISTER, lexeme: "r3"},
+			{category: COMMA, lexeme: ","},
+			{category: REGISTER, lexeme: "r4"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r5"},
+			{category: EOL, lexeme: "\n"},
+			//   mult  r5, r6 => r10
+			{category: ARITHOP, lexeme: "mult"},
+			{category: REGISTER, lexeme: "r5"},
+			{category: COMMA, lexeme: ","},
+			{category: REGISTER, lexeme: "r6"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r10"},
+			{category: EOL, lexeme: "\n"},
+			//   lshift  r0, r3 => r2
+			{category: ARITHOP, lexeme: "lshift"},
+			{category: REGISTER, lexeme: "r0"},
+			{category: COMMA, lexeme: ","},
+			{category: REGISTER, lexeme: "r3"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r2"},
+			{category: EOL, lexeme: "\n"},
+			//   rshift  r2, r3 => r2
+			{category: ARITHOP, lexeme: "rshift"},
+			{category: REGISTER, lexeme: "r2"},
+			{category: COMMA, lexeme: ","},
+			{category: REGISTER, lexeme: "r3"},
+			{category: INTO, lexeme: "=>"},
+			{category: REGISTER, lexeme: "r2"},
+			{category: EOL, lexeme: "\n"},
+			//   output 1024
+			{category: OUTPUT, lexeme: "output"},
+			{category: CONSTANT, lexeme: "1024"},
+			{category: EOL, lexeme: "\n"},
+			//   nop
 			{category: NOP, lexeme: "nop"},
 			{category: EOL, lexeme: "\n"},
 			// Final EOF
@@ -361,7 +631,6 @@ func runTest(tc TestCase, t *testing.T) {
 			if !tc.expectedError {
 				t.Errorf("Unexpected error: %v", err)
 			}
-			break
 		}
 		tokens = append(tokens, tok)
 		if tok.category == EOF {

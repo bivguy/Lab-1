@@ -1,0 +1,7 @@
+loadI 20=>r1
+load  r1=>r2
+mult  r1,r2 => r3 r4 
+mult  r1,r2 => r3 a  
+store r3 => r1 
+output 20
+

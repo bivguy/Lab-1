@@ -5,49 +5,84 @@ import "errors"
 // This function operates under the state that 'l' and 's' have already been consumed
 func (s *scanner) lshiftHelper() (syntacticCategory, error) {
 	category := INVALID
-	c, _ := s.next()
+	c, err := s.next()
 	if c != 'h' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid lshift instruction: letter 'h' expected but found " + string(c))
 	}
 	c, _ = s.next()
 	if c != 'i' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid lshift instruction: letter 'i' expected but found " + string(c))
 	}
 	c, _ = s.next()
 	if c != 'f' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid lshift instruction: letter 'f' expected but found " + string(c))
 
 	}
 	c, _ = s.next()
 	if c != 't' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid lshift instruction: letter 't' expected but found " + string(c))
+	}
+
+	if !s.checkValidEnding() {
+		return category, errors.New("invalid lshift instruction: unexpected character found after 'lshift'")
 	}
 	return ARITHOP, nil
 }
 
 func (s *scanner) outputHelper() (syntacticCategory, error) {
 	category := INVALID
-	c, _ := s.next()
+	c, err := s.next()
 	if c != 'u' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid output instruction: letter 'u' expected but found " + string(c))
 	}
 	c, _ = s.next()
 	if c != 't' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid output instruction: letter 't' expected but found " + string(c))
 	}
 	c, _ = s.next()
 	if c != 'p' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid output instruction: letter 'p' expected but found " + string(c))
 	}
 
 	c, _ = s.next()
 	if c != 'u' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid output instruction: letter 'u' expected but found " + string(c))
 	}
 
 	c, _ = s.next()
 	if c != 't' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid output instruction: letter 't' expected but found " + string(c))
+	}
+
+	if !s.checkValidEnding() {
+		return category, errors.New("invalid output instruction: unexpected character found after 'output'")
 	}
 
 	return OUTPUT, nil
@@ -55,17 +90,30 @@ func (s *scanner) outputHelper() (syntacticCategory, error) {
 
 func (s *scanner) storeHelper() (syntacticCategory, error) {
 	category := INVALID
-	c, _ := s.next()
+	c, err := s.next()
 	if c != 'o' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid store instruction: letter 'o' expected but found " + string(c))
 	}
 	c, _ = s.next()
 	if c != 'r' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid store instruction: letter 'r' expected but found " + string(c))
 	}
 	c, _ = s.next()
 	if c != 'e' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid store instruction: letter 'e' expected but found " + string(c))
+	}
+
+	if !s.checkValidEnding() {
+		return category, errors.New("invalid store instruction: unexpected character found after 'store'")
 	}
 	return MEMOP, nil
 }
@@ -74,9 +122,16 @@ func (s *scanner) storeHelper() (syntacticCategory, error) {
 
 func (s *scanner) subHelper() (syntacticCategory, error) {
 	category := INVALID
-	c, _ := s.next()
+	c, err := s.next()
 	if c != 'b' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid sub instruction: letter 'b' expected but found " + string(c))
+	}
+
+	if !s.checkValidEnding() {
+		return category, errors.New("invalid sub instruction: unexpected character found after 'sub'")
 	}
 	return ARITHOP, nil
 }
@@ -84,14 +139,24 @@ func (s *scanner) subHelper() (syntacticCategory, error) {
 func (s *scanner) addHelper() (syntacticCategory, error) {
 	category := INVALID
 
-	c, _ := s.next()
+	c, err := s.next()
 	if c != 'd' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid add instruction: letter 'd' expected but found " + string(c))
 	}
 
 	c, _ = s.next()
 	if c != 'd' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid add instruction: letter 'd' expected but found " + string(c))
+	}
+
+	if !s.checkValidEnding() {
+		return category, errors.New("invalid add instruction: unexpected character found after 'add'")
 	}
 
 	return ARITHOP, nil
@@ -100,19 +165,32 @@ func (s *scanner) addHelper() (syntacticCategory, error) {
 func (s *scanner) multHelper() (syntacticCategory, error) {
 	category := INVALID
 
-	c, _ := s.next()
+	c, err := s.next()
 	if c != 'u' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid mult instruction: letter 'u' expected but found " + string(c))
 	}
 
 	c, _ = s.next()
 	if c != 'l' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid mult instruction: letter 'l' expected but found " + string(c))
 	}
 
 	c, _ = s.next()
 	if c != 't' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid mult instruction: letter 't' expected but found " + string(c))
+	}
+
+	if !s.checkValidEnding() {
+		return category, errors.New("invalid mult instruction: unexpected character found after 'mult'")
 	}
 
 	return ARITHOP, nil
@@ -120,21 +198,37 @@ func (s *scanner) multHelper() (syntacticCategory, error) {
 
 func (s *scanner) rshiftHelper() (syntacticCategory, error) {
 	category := INVALID
-	c, _ := s.next()
+	c, err := s.next()
 	if c != 'h' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid rshift instruction: letter 'h' expected but found " + string(c))
 	}
 	c, _ = s.next()
 	if c != 'i' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid rshift instruction: letter 'i' expected but found " + string(c))
 	}
 	c, _ = s.next()
 	if c != 'f' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid rshift instruction: letter 'f' expected but found " + string(c))
 	}
 	c, _ = s.next()
 	if c != 't' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid rshift instruction: letter 't' expected but found " + string(c))
+	}
+
+	if !s.checkValidEnding() {
+		return category, errors.New("invalid rshift instruction: unexpected character found after 'rshift'")
 	}
 	return ARITHOP, nil
 }
@@ -142,18 +236,24 @@ func (s *scanner) rshiftHelper() (syntacticCategory, error) {
 func (s *scanner) loadHelper() (syntacticCategory, error) {
 	category := INVALID
 
-	c, _ := s.next()
+	c, err := s.next()
 	if c != 'a' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid load instruction: letter 'a' expected but found " + string(c))
 	}
 
 	c, _ = s.next()
 	if c != 'd' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid load instruction: letter 'd' expected but found " + string(c))
 	}
 
 	// check if the next letter is an I, indicating that the instruction is loadI
-	c, err := s.next() // THIS IS GIVING A BUG RN BECAUSE OF INDEXING
+	c, err = s.next() // THIS IS GIVING A BUG RN BECAUSE OF INDEXING
 	if err != nil {
 		// if there is an error, it means we reached the end of the line, so the instruction must be load
 		s.curIdx--
@@ -161,13 +261,16 @@ func (s *scanner) loadHelper() (syntacticCategory, error) {
 	}
 
 	if c == 'I' {
+		if !s.checkValidEnding() {
+			return category, errors.New("invalid loadI instruction: unexpected character found after 'loadI'")
+		}
 		category = LOADI
 	} else {
-		// if the next letter is not an I, it must be a space, indicating that the instruction is load
-		if c != ' ' && c != '\t' {
-			return category, errors.New("invalid load instruction: letter 'I' or whitespace expected but found " + string(c))
+		// if the next letter is not an I, it must be a valid ending character
+		s.curIdx--
+		if !(s.checkValidEnding()) {
+			return category, errors.New("invalid load instruction: invalid character after load: " + string(c))
 		}
-		s.curIdx-- // step back one character since we read one character too many
 		category = MEMOP
 	}
 
@@ -178,14 +281,24 @@ func (s *scanner) loadHelper() (syntacticCategory, error) {
 func (s *scanner) nopHelper() (syntacticCategory, error) {
 	category := INVALID
 
-	c, _ := s.next()
+	c, err := s.next()
 	if c != 'o' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid nop instruction: letter 'o' expected but found " + string(c))
 	}
 
 	c, _ = s.next()
 	if c != 'p' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid nop instruction: letter 'p' expected but found " + string(c))
+	}
+
+	if !s.checkValidEnding() {
+		return category, errors.New("invalid nop instruction: unexpected character found after 'nop'")
 	}
 
 	return NOP, nil
@@ -194,8 +307,11 @@ func (s *scanner) nopHelper() (syntacticCategory, error) {
 func (s *scanner) intoHelper() (syntacticCategory, error) {
 	category := INVALID
 
-	c, _ := s.next()
+	c, err := s.next()
 	if c != '>' {
+		if err != nil {
+			s.curIdx--
+		}
 		return category, errors.New("invalid 'into' instruction: letter '>' expected but found " + string(c))
 	}
 
@@ -214,11 +330,12 @@ func (s *scanner) constantHelper(c byte) (syntacticCategory, error) {
 			return CONSTANT, nil
 		}
 	}
-	s.curIdx-- // step back one character since we read one character too many
 
-	if c != ' ' && c != '\t' && c != '\n' && c != '\r' && c != '=' {
+	if c != ' ' && c != '\t' && c != '\n' && c != '\r' && c != '=' && c != '/' {
 		return category, errors.New("invalid constant: whitespace or end of line expected but found " + string(c))
 	}
+
+	s.curIdx-- // step back one character since we read one character too many
 
 	return CONSTANT, nil
 }
@@ -229,6 +346,7 @@ func (s *scanner) commentHelper() (syntacticCategory, error) {
 	category := INVALID
 	c, err := s.next()
 	if err != nil {
+		s.curIdx--
 		// if there is an error, comment is invalid
 		return category, errors.New("invalid comment: expected another '/' but found end of file")
 	}
@@ -254,11 +372,29 @@ func (s *scanner) registerHelper(c byte) (syntacticCategory, error) {
 			return REGISTER, nil
 		}
 	}
-	s.curIdx-- // step back one character since we read one character too many
 
-	if c != ' ' && c != '\t' && c != '\n' && c != '\r' && c != ',' && c != '=' {
+	if c != ' ' && c != '\t' && c != '\n' && c != '\r' && c != ',' && c != '=' && c != '/' {
 		return category, errors.New("invalid constant: whitespace or end of line expected but found " + string(c))
 	}
 
+	s.curIdx-- // step back one character since we read one character too many
+
 	return REGISTER, nil
+}
+
+func (s *scanner) checkValidEnding() bool {
+	if s.curIdx >= (len(s.lineText) - 1) {
+		return true
+	}
+
+	c, err := s.next()
+
+	// valid characters that can come after some token
+	// error means we reached the end of the file, while is also valid
+	if err != nil || c == '/' || c == ' ' || c == '\t' || c == '\n' || c == '\r' {
+		s.curIdx--
+		return true
+	}
+
+	return false
 }
