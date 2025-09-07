@@ -1,9 +1,13 @@
 package scanner
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/bivguy/Comp412/models"
+)
 
 // This function operates under the state that 'l' and 's' have already been consumed
-func (s *scanner) lshiftHelper() (syntacticCategory, error) {
+func (s *scanner) lshiftHelper() (models.SyntacticCategory, error) {
 	category := INVALID
 	c, err := s.next()
 	if c != 'h' {
@@ -41,7 +45,7 @@ func (s *scanner) lshiftHelper() (syntacticCategory, error) {
 	return ARITHOP, nil
 }
 
-func (s *scanner) outputHelper() (syntacticCategory, error) {
+func (s *scanner) outputHelper() (models.SyntacticCategory, error) {
 	category := INVALID
 	c, err := s.next()
 	if c != 'u' {
@@ -88,7 +92,7 @@ func (s *scanner) outputHelper() (syntacticCategory, error) {
 	return OUTPUT, nil
 }
 
-func (s *scanner) storeHelper() (syntacticCategory, error) {
+func (s *scanner) storeHelper() (models.SyntacticCategory, error) {
 	category := INVALID
 	c, err := s.next()
 	if c != 'o' {
@@ -120,7 +124,7 @@ func (s *scanner) storeHelper() (syntacticCategory, error) {
 
 // ALL ATHROP HELPS ARE LISTED BELOW
 
-func (s *scanner) subHelper() (syntacticCategory, error) {
+func (s *scanner) subHelper() (models.SyntacticCategory, error) {
 	category := INVALID
 	c, err := s.next()
 	if c != 'b' {
@@ -136,7 +140,7 @@ func (s *scanner) subHelper() (syntacticCategory, error) {
 	return ARITHOP, nil
 }
 
-func (s *scanner) addHelper() (syntacticCategory, error) {
+func (s *scanner) addHelper() (models.SyntacticCategory, error) {
 	category := INVALID
 
 	c, err := s.next()
@@ -162,7 +166,7 @@ func (s *scanner) addHelper() (syntacticCategory, error) {
 	return ARITHOP, nil
 }
 
-func (s *scanner) multHelper() (syntacticCategory, error) {
+func (s *scanner) multHelper() (models.SyntacticCategory, error) {
 	category := INVALID
 
 	c, err := s.next()
@@ -196,7 +200,7 @@ func (s *scanner) multHelper() (syntacticCategory, error) {
 	return ARITHOP, nil
 }
 
-func (s *scanner) rshiftHelper() (syntacticCategory, error) {
+func (s *scanner) rshiftHelper() (models.SyntacticCategory, error) {
 	category := INVALID
 	c, err := s.next()
 	if c != 'h' {
@@ -233,7 +237,7 @@ func (s *scanner) rshiftHelper() (syntacticCategory, error) {
 	return ARITHOP, nil
 }
 
-func (s *scanner) loadHelper() (syntacticCategory, error) {
+func (s *scanner) loadHelper() (models.SyntacticCategory, error) {
 	category := INVALID
 
 	c, err := s.next()
@@ -278,7 +282,7 @@ func (s *scanner) loadHelper() (syntacticCategory, error) {
 
 }
 
-func (s *scanner) nopHelper() (syntacticCategory, error) {
+func (s *scanner) nopHelper() (models.SyntacticCategory, error) {
 	category := INVALID
 
 	c, err := s.next()
@@ -304,7 +308,7 @@ func (s *scanner) nopHelper() (syntacticCategory, error) {
 	return NOP, nil
 }
 
-func (s *scanner) intoHelper() (syntacticCategory, error) {
+func (s *scanner) intoHelper() (models.SyntacticCategory, error) {
 	category := INVALID
 
 	c, err := s.next()
@@ -318,7 +322,7 @@ func (s *scanner) intoHelper() (syntacticCategory, error) {
 	return INTO, nil
 }
 
-func (s *scanner) constantHelper(c byte) (syntacticCategory, error) {
+func (s *scanner) constantHelper(c byte) (models.SyntacticCategory, error) {
 	var err error
 
 	category := INVALID
@@ -340,7 +344,7 @@ func (s *scanner) constantHelper(c byte) (syntacticCategory, error) {
 	return CONSTANT, nil
 }
 
-func (s *scanner) commentHelper() (syntacticCategory, error) {
+func (s *scanner) commentHelper() (models.SyntacticCategory, error) {
 	var err error
 
 	category := INVALID
@@ -360,7 +364,7 @@ func (s *scanner) commentHelper() (syntacticCategory, error) {
 	return COMMENT, nil
 }
 
-func (s *scanner) registerHelper(c byte) (syntacticCategory, error) {
+func (s *scanner) registerHelper(c byte) (models.SyntacticCategory, error) {
 	var err error
 
 	category := INVALID

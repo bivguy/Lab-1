@@ -5,6 +5,8 @@ import (
 	"errors"
 	"io"
 	"os"
+
+	"github.com/bivguy/Comp412/models"
 )
 
 type scanner struct {
@@ -17,27 +19,28 @@ type scanner struct {
 	lineNumber int
 }
 
-type token struct {
-	category syntacticCategory
-	lexeme   string
-}
+// type token struct {
+// 	category   syntacticCategory
+// 	lexeme     string
+// 	lineNumber int
+// }
 
-type syntacticCategory int
+// type syntacticCategory int
 
 const (
-	MEMOP    syntacticCategory = iota // 0
-	LOADI                             // 1
-	ARITHOP                           // 2
-	OUTPUT                            // 3
-	NOP                               // 4
-	CONSTANT                          // 5
-	REGISTER                          // 6
-	COMMA                             // 7
-	INTO                              // 8
-	EOF                               // 9
-	EOL                               // 10
-	COMMENT                           // 11; not used explicity in this project, but rather for discarding
-	INVALID                           // 12; not used explicitly in this project, but rather for error handling
+	MEMOP    models.SyntacticCategory = iota // 0
+	LOADI                                    // 1
+	ARITHOP                                  // 2
+	OUTPUT                                   // 3
+	NOP                                      // 4
+	CONSTANT                                 // 5
+	REGISTER                                 // 6
+	COMMA                                    // 7
+	INTO                                     // 8
+	EOF                                      // 9
+	EOL                                      // 10
+	COMMENT                                  // 11; not used explicity in this project, but rather for discarding
+	INVALID                                  // 12; not used explicitly in this project, but rather for error handling
 )
 
 var syntactic_categories = []string{
@@ -62,7 +65,7 @@ func New(file *os.File) *scanner {
 	return &scanner{curIdx: -1, startIdx: -1, lineNumber: -1, lineReader: lineReader, lineEnd: true}
 }
 
-func (s *scanner) NextToken() (token, error) {
+func (s *scanner) NextToken() (models.Token, error) {
 	category := INVALID
 	var lexeme string
 	var err error
@@ -71,13 +74,13 @@ func (s *scanner) NextToken() (token, error) {
 		hasLine, err := s.initLine()
 		// If there is no new line to process and we reached the end of the file, return EOF token
 		if !hasLine && err == io.EOF {
-			return token{category: EOF, lexeme: ""}, nil
+			return models.Token{Category: EOF, Lexeme: "", LineNumber: s.lineNumber}, nil
 		}
 
 		// If there is no new line to process but we did not reach the end of the file, return an error
 		if err != nil && err != io.EOF {
 			s.lineEnd = true
-			return token{category: INVALID, lexeme: ""}, err
+			return models.Token{Category: INVALID, Lexeme: "", LineNumber: s.lineNumber}, err
 		}
 	}
 
@@ -87,7 +90,7 @@ func (s *scanner) NextToken() (token, error) {
 	c, err := s.next()
 	// if there is an error, it means we reached the end of the file
 	if err != nil {
-		return token{category: EOF, lexeme: ""}, nil
+		return models.Token{Category: EOF, Lexeme: "", LineNumber: s.lineNumber}, nil
 	}
 	s.startIdx = s.curIdx // mark the beginning of the current lexeme
 
@@ -98,7 +101,7 @@ func (s *scanner) NextToken() (token, error) {
 		c, err = s.next()
 		if err != nil {
 			s.lineEnd = true
-			return token{category: INVALID, lexeme: ""}, err
+			return models.Token{Category: INVALID, Lexeme: "", LineNumber: s.lineNumber}, err
 		}
 		switch {
 		// if the next letter is an o, it must be load or loadI
@@ -121,7 +124,7 @@ func (s *scanner) NextToken() (token, error) {
 		c, err = s.next()
 		if err != nil {
 			s.lineEnd = true
-			return token{category: INVALID, lexeme: ""}, err
+			return models.Token{Category: INVALID, Lexeme: "", LineNumber: s.lineNumber}, err
 		}
 		switch {
 		// if the next letter is a t, it must be store
@@ -149,16 +152,16 @@ func (s *scanner) NextToken() (token, error) {
 		category, err = s.commentHelper()
 		if err != nil {
 			s.lineEnd = true
-			return token{category: INVALID, lexeme: ""}, err
+			return models.Token{Category: INVALID, Lexeme: "", LineNumber: s.lineNumber}, err
 		}
 
-		return token{category: category, lexeme: "//"}, nil
+		return models.Token{Category: category, Lexeme: "//", LineNumber: s.lineNumber}, nil
 	// if it starts with an r, it indicates a register or rshift
 	case c == 'r':
 		c, err = s.next()
 		if err != nil {
 			s.lineEnd = true
-			return token{category: INVALID, lexeme: ""}, err
+			return models.Token{Category: INVALID, Lexeme: "", LineNumber: s.lineNumber}, err
 		}
 
 		switch {
@@ -180,11 +183,11 @@ func (s *scanner) NextToken() (token, error) {
 
 	if err != nil {
 		s.lineEnd = true
-		// return token{category: category, lexeme: ""}, err
+		// return token{Category: category, Lexeme: ""}, err
 	}
 
 	lexeme = s.lineText[s.startIdx : s.curIdx+1]
-	return token{category: category, lexeme: lexeme}, err
+	return models.Token{Category: category, Lexeme: lexeme, LineNumber: s.lineNumber}, err
 }
 
 // This function initializes the scanner state for a new line. It returns true if there is a new line to process, false otherwise.
