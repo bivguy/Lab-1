@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	. "github.com/bivguy/Comp412/constants"
 	"github.com/bivguy/Comp412/models"
 )
 

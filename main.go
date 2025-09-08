@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	c "github.com/bivguy/Comp412/constants"
 	"github.com/bivguy/Comp412/scanner"
 )
 
@@ -41,7 +42,7 @@ func main() {
 				fmt.Fprintf(os.Stderr, "Unexpected error: %v\n", err)
 				break
 			}
-			if tok.Category == EOF {
+			if tok.Category == c.EOF {
 				break
 			}
 		}

@@ -3,6 +3,7 @@ package scanner
 import (
 	"errors"
 
+	. "github.com/bivguy/Comp412/constants"
 	"github.com/bivguy/Comp412/models"
 )
 
