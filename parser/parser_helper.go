@@ -21,11 +21,56 @@ const (
 var memopCategories = []m.SyntacticCategory{c.REGISTER, c.INTO, c.REGISTER, c.EO}
 var memopArgs = []category{OPONE, SKIP, OPTHREE, SKIP}
 
-var loadICategories = []m.SyntacticCategory{c.LOADI, c.CONSTANT, c.INTO, c.REGISTER}
+var loadICategories = []m.SyntacticCategory{c.CONSTANT, c.INTO, c.REGISTER, c.EO}
 var loadIArgs = []category{OPONE, SKIP, OPTHREE, SKIP}
+
+var arithopCategories = []m.SyntacticCategory{c.REGISTER, c.COMMA, c.REGISTER, c.INTO, c.REGISTER, c.EO}
+var arithipArgs = []category{OPONE, SKIP, OPTWO, SKIP, OPTHREE, SKIP}
+
+var outputCategories = []m.SyntacticCategory{c.REGISTER, c.EO}
+var outputArgs = []category{OPTHREE, SKIP}
+
+var nopCategories = []m.SyntacticCategory{c.EO}
+var nopArgs = []category{SKIP}
 
 func (p *parser) finishMemop() error {
 	err := p.buildCategories(memopCategories, memopArgs)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *parser) finishLoadI() error {
+	err := p.buildCategories(loadICategories, loadIArgs)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *parser) finishArithop() error {
+	err := p.buildCategories(arithopCategories, arithipArgs)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *parser) finishOutput() error {
+	err := p.buildCategories(outputCategories, outputArgs)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *parser) finishNOP() error {
+	err := p.buildCategories(nopCategories, nopArgs)
 	if err != nil {
 		return err
 	}
@@ -92,7 +137,7 @@ func (p *parser) sourceRegisterHelper(lexeme string) (int, error) {
 		start = 1
 	}
 
-	SR, err := strconv.Atoi(lexeme[start:len(lexeme)])
+	SR, err := strconv.Atoi(lexeme[start:])
 	if err != nil {
 		return -1, err
 	}

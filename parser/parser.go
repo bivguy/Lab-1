@@ -24,7 +24,7 @@ func New(scanner scanner) *parser {
 }
 
 func (p *parser) Parse() (*list.List, error) {
-	token, err := p.nextToken()
+	token, err := p.nextOperationToken()
 
 	if err != nil {
 		return nil, err
@@ -46,15 +46,41 @@ func (p *parser) Parse() (*list.List, error) {
 			p.operations.PushFront(p.currentOperation)
 			p.currentOperation = m.OperationNode{}
 		case c.LOADI:
+			err = p.finishLoadI()
+			if err != nil {
+				return nil, err
+			}
+
+			p.operations.PushFront(p.currentOperation)
+			p.currentOperation = m.OperationNode{}
 		case c.ARITHOP:
+			err = p.finishArithop()
+			if err != nil {
+				return nil, err
+			}
+
+			p.operations.PushFront(p.currentOperation)
+			p.currentOperation = m.OperationNode{}
 		case c.OUTPUT:
+			err = p.finishOutput()
+			if err != nil {
+				return nil, err
+			}
+			p.operations.PushFront(p.currentOperation)
+			p.currentOperation = m.OperationNode{}
 		case c.NOP:
+			err = p.finishNOP()
+			if err != nil {
+				return nil, err
+			}
+			p.operations.PushFront(p.currentOperation)
+			p.currentOperation = m.OperationNode{}
 		default:
 			p.currentOperation = m.OperationNode{}
 			return nil, fmt.Errorf("expected a valid opcode category but instead got %v", token)
 		}
 
-		token, err = p.scanner.NextToken()
+		token, err = p.nextOperationToken()
 		if err != nil {
 			p.currentOperation = m.OperationNode{}
 			return nil, scannerError(err)
@@ -80,6 +106,23 @@ func (p *parser) nextToken() (m.Token, error) {
 	}
 
 	return token, err
+}
+
+func (p *parser) nextOperationToken() (m.Token, error) {
+	token, err := p.nextToken()
+	if err != nil {
+		return m.Token{}, scannerError(err)
+	}
+
+	for token.Category == c.EOL {
+		token, err = p.scanner.NextToken()
+		if err != nil {
+			return m.Token{}, scannerError(err)
+		}
+	}
+
+	return token, err
+
 }
 
 // indicates that there is an error with the scanner's nextToken
