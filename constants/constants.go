@@ -16,6 +16,7 @@ const (
 	EOL                                      // 10
 	COMMENT                                  // 11; not used explicity in this project, but rather for discarding
 	INVALID                                  // 12; not used explicitly in this project, but rather for error handling
+	EO                                       // 13; used to signifiy either EOL or EOF
 )
 
 var SyntacticCategories = []string{

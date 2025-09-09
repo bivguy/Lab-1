@@ -655,10 +655,5 @@ func runTest(tc TestCase, t *testing.T) {
 		if curToken.Lexeme != expected.Lexeme {
 			t.Errorf("Token %d - expected lexeme %+v, got %+v", i, expected.Lexeme, curToken.Lexeme)
 		}
-
-		// if tokens[i] != expected {
-		// 	t.Errorf("Token %d - expected %+v, got %+v", i, expected, tokens[i])
-		// }
 	}
-	// return false
 }

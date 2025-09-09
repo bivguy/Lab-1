@@ -18,14 +18,14 @@ const (
 	SKIP
 )
 
-var memopCategories = []m.SyntacticCategory{c.REGISTER, c.INTO, c.REGISTER, c.EOL}
+var memopCategories = []m.SyntacticCategory{c.REGISTER, c.INTO, c.REGISTER, c.EO}
 var memopArgs = []category{OPONE, SKIP, OPTHREE, SKIP}
 
 var loadICategories = []m.SyntacticCategory{c.LOADI, c.CONSTANT, c.INTO, c.REGISTER}
 var loadIArgs = []category{OPONE, SKIP, OPTHREE, SKIP}
 
 func (p *parser) finishMemop() error {
-	err := p.checkCategories(memopCategories, memopArgs)
+	err := p.buildCategories(memopCategories, memopArgs)
 	if err != nil {
 		return err
 	}
@@ -33,13 +33,19 @@ func (p *parser) finishMemop() error {
 	return nil
 }
 
-func (p *parser) checkCategories(expectedCategories []m.SyntacticCategory, expectedArgs []category) error {
+func (p *parser) buildCategories(expectedCategories []m.SyntacticCategory, expectedArgs []category) error {
 	for i, cat := range expectedCategories {
 		token, err := p.nextToken()
 		if err != nil {
 			return err
 		}
-		if token.Category != cat {
+		tokenCat := token.Category
+		// check the special case of EO
+		if cat == c.EO {
+			if tokenCat != c.EOL && tokenCat != c.EOF {
+				return fmt.Errorf("encountered an error at line %d: expected a token of type EOF or EOF but got one of type %v", token.LineNumber, c.SyntacticCategories[tokenCat])
+			}
+		} else if tokenCat != cat {
 			return tokenError(token.Category, cat, token)
 		}
 
@@ -53,6 +59,7 @@ func (p *parser) checkCategories(expectedCategories []m.SyntacticCategory, expec
 	return nil
 }
 
+// given a token and a category, it adds it to its corresponding place for the operation being built
 func (p *parser) buildOperation(token m.Token, arg category) error {
 	if arg == SKIP {
 		return nil
@@ -85,7 +92,7 @@ func (p *parser) sourceRegisterHelper(lexeme string) (int, error) {
 		start = 1
 	}
 
-	SR, err := strconv.Atoi(lexeme[start : len(lexeme)+1])
+	SR, err := strconv.Atoi(lexeme[start:len(lexeme)])
 	if err != nil {
 		return -1, err
 	}
