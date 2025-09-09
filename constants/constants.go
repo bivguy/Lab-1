@@ -17,3 +17,19 @@ const (
 	COMMENT                                  // 11; not used explicity in this project, but rather for discarding
 	INVALID                                  // 12; not used explicitly in this project, but rather for error handling
 )
+
+var SyntacticCategories = []string{
+	"MEMOP",
+	"LOADI",
+	"ARITHOP",
+	"OUTPUT",
+	"NOP",
+	"CONSTANT",
+	"REGISTER",
+	"COMMA",
+	"INTO",
+	"EOF",
+	"EOL",
+	"COMMENT",
+	"INVALID",
+}

@@ -3,6 +3,7 @@ package scanner
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 
@@ -20,42 +21,10 @@ type scanner struct {
 	lineNumber int
 }
 
-// const (
-// 	MEMOP    models.SyntacticCategory = iota // 0
-// 	LOADI                                    // 1
-// 	ARITHOP                                  // 2
-// 	OUTPUT                                   // 3
-// 	NOP                                      // 4
-// 	CONSTANT                                 // 5
-// 	REGISTER                                 // 6
-// 	COMMA                                    // 7
-// 	INTO                                     // 8
-// 	EOF                                      // 9
-// 	EOL                                      // 10
-// 	COMMENT                                  // 11; not used explicity in this project, but rather for discarding
-// 	INVALID                                  // 12; not used explicitly in this project, but rather for error handling
-// )
-
-var syntactic_categories = []string{
-	"MEMOP",
-	"LOADI",
-	"ARITHOP",
-	"OUTPUT",
-	"NOP",
-	"CONSTANT",
-	"REGISTER",
-	"COMMA",
-	"INTO",
-	"EOF",
-	"EOL",
-	"COMMENT",
-	"INVALID",
-}
-
 func New(file *os.File) *scanner {
 	lineReader := bufio.NewReader(file)
 
-	return &scanner{curIdx: -1, startIdx: -1, lineNumber: -1, lineReader: lineReader, lineEnd: true}
+	return &scanner{curIdx: -1, startIdx: -1, lineNumber: 0, lineReader: lineReader, lineEnd: true}
 }
 
 func (s *scanner) NextToken() (models.Token, error) {
@@ -170,7 +139,7 @@ func (s *scanner) NextToken() (models.Token, error) {
 		if c >= '0' && c <= '9' {
 			category, err = s.constantHelper(c)
 		} else {
-			err = errors.New("unrecognized instruction: " + string(c))
+			err = fmt.Errorf("unrecognized instruction: %q at line %d", c, s.lineNumber)
 		}
 	}
 
@@ -206,7 +175,7 @@ func (s *scanner) next() (byte, error) {
 	s.curIdx++
 	if s.curIdx >= s.lineLength {
 		// This signifies we have reached the end of the file prematurely
-		return 0, errors.New("reached end of file prematurely")
+		return 0, fmt.Errorf("reached end of file prematurely at line %d", s.lineNumber)
 	}
 	return s.lineText[s.curIdx], nil
 }
@@ -220,4 +189,8 @@ func (s *scanner) skipWhitespace() {
 			break
 		}
 	}
+}
+
+func (s *scanner) PrintToken(token models.Token) {
+	fmt.Printf("<%v, %q> at line %d\n", SyntacticCategories[token.Category], token.Lexeme, token.LineNumber)
 }

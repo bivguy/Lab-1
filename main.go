@@ -42,6 +42,7 @@ func main() {
 				fmt.Fprintf(os.Stderr, "Unexpected error: %v\n", err)
 				break
 			}
+			scanner.PrintToken(tok)
 			if tok.Category == c.EOF {
 				break
 			}
