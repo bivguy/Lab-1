@@ -8,8 +8,8 @@ import (
 
 	c "github.com/bivguy/Comp412/constants"
 	m "github.com/bivguy/Comp412/models"
-
 	"github.com/bivguy/Comp412/parser"
+
 	"github.com/bivguy/Comp412/scanner"
 )
 
@@ -28,8 +28,14 @@ func main() {
 
 	if *hFlag {
 		helpMessage()
-	} else if *rFlag != "" {
-		file, err := os.Open(*rFlag)
+	} else if *rFlag != "" || *pFlag != "" {
+
+		path := *rFlag
+		if path == "" {
+			path = *pFlag
+		}
+
+		file, err := os.Open(path)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Failed to open file: %v\n", err)
 			return
@@ -37,10 +43,19 @@ func main() {
 		defer file.Close()
 		scanner := scanner.New(file)
 		parser := parser.New(scanner)
-		IR, _ := parser.Parse()
+		IR, err := parser.Parse()
 
-		fmt.Println(PrettyPrintIR(IR))
-	} else if *pFlag != "" {
+		// print the results of the parser's Intermediate Representation in a human readable format
+		if *rFlag != "" {
+			fmt.Println(PrettyPrintIR(IR))
+		} else { // *p flag
+			if parser.ErrorFound || err != nil {
+				fmt.Println("Parse found errors")
+			} else {
+				fmt.Printf("Parse succeeded. Processed %d operations.\n", IR.Len())
+			}
+
+		}
 
 	} else if *sFlag != "" { // opening a file and outputting all the results of the scanner
 		file, err := os.Open(*sFlag)
@@ -53,7 +68,7 @@ func main() {
 		for {
 			tok, err := scanner.NextToken()
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "ERROR: Unexpected error: %v\n", err)
+				fmt.Fprintf(os.Stderr, "ERROR %d: Unexpected error: %v\n", tok.LineNumber, err)
 				break
 			}
 			scanner.PrintToken(tok)

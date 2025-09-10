@@ -198,3 +198,7 @@ func (s *scanner) PrintToken(token models.Token) {
 func (s *scanner) SetNextLine() {
 	s.lineEnd = true
 }
+
+func (s *scanner) GetCurrentLine() int {
+	return s.lineNumber
+}

@@ -20,6 +20,7 @@ type parser struct {
 type scanner interface {
 	NextToken() (models.Token, error)
 	SetNextLine()
+	GetCurrentLine() int
 }
 
 func New(scanner scanner) *parser {
@@ -52,7 +53,8 @@ func (p *parser) Parse() (*list.List, error) {
 		}
 
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "ERROR: ", err)
+			wrappedErr := fmt.Errorf("ERROR %d: %w", p.scanner.GetCurrentLine(), err)
+			fmt.Fprintln(os.Stderr, wrappedErr)
 			p.ErrorFound = true
 		} else {
 			p.operations.PushBack(p.currentOperation)
@@ -73,7 +75,8 @@ func (p *parser) nextCorrectToken() m.Token {
 	// keep printing out the errors of the scanner if they occur
 	for err != nil {
 		p.ErrorFound = true
-		fmt.Fprintln(os.Stderr, "ERROR:: ", scannerError(err))
+		wrappedErr := fmt.Errorf("ERROR %d: %w", p.scanner.GetCurrentLine(), err)
+		fmt.Fprintln(os.Stderr, wrappedErr)
 		token, err = p.scanner.NextToken()
 	}
 
