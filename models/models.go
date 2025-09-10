@@ -1,7 +1,6 @@
 package models
 
 import (
-	"container/list"
 	"fmt"
 )
 
@@ -29,4 +28,13 @@ type OperationNode struct {
 	OpThree Operand
 }
 
-type IntermediateRepresentation *list.List
+func (op OperationNode) String() string {
+	return fmt.Sprintf(
+		"Line %d: %s %v %v %v",
+		op.Line,
+		op.Opcode,
+		op.OpOne,
+		op.OpTwo,
+		op.OpThree,
+	)
+}

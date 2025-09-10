@@ -27,7 +27,7 @@ var loadIArgs = []category{OPONE, SKIP, OPTHREE, SKIP}
 var arithopCategories = []m.SyntacticCategory{c.REGISTER, c.COMMA, c.REGISTER, c.INTO, c.REGISTER, c.EO}
 var arithipArgs = []category{OPONE, SKIP, OPTWO, SKIP, OPTHREE, SKIP}
 
-var outputCategories = []m.SyntacticCategory{c.REGISTER, c.EO}
+var outputCategories = []m.SyntacticCategory{c.CONSTANT, c.EO}
 var outputArgs = []category{OPTHREE, SKIP}
 
 var nopCategories = []m.SyntacticCategory{c.EO}
