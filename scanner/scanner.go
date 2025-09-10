@@ -96,7 +96,7 @@ func (s *scanner) NextToken() (models.Token, error) {
 		case c == 'u':
 			category, err = s.subHelper()
 		default:
-			err = errors.New("invalid instruction: letter 't' or 'u' expected but found " + string(c))
+			err = fmt.Errorf("invalid instruction: letter 't' or 'u' expected but found %q at line %d", c, s.lineNumber)
 		}
 	case c == 'a':
 		category, err = s.addHelper()
@@ -193,4 +193,8 @@ func (s *scanner) skipWhitespace() {
 
 func (s *scanner) PrintToken(token models.Token) {
 	fmt.Printf("<%v, %q> at line %d\n", SyntacticCategories[token.Category], token.Lexeme, token.LineNumber)
+}
+
+func (s *scanner) SetNextLine() {
+	s.lineEnd = true
 }

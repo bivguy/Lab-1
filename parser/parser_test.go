@@ -34,7 +34,6 @@ func runTest(tc TestCase, t *testing.T) {
 	if !compareIR(tc.expectedIR, IR) {
 		t.Errorf("IR mismatch in %s", tc.description)
 	}
-
 }
 
 func compareIR(expected, actual *list.List) bool {

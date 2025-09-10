@@ -80,7 +80,8 @@ func (p *parser) finishNOP() error {
 
 func (p *parser) buildCategories(expectedCategories []m.SyntacticCategory, expectedArgs []category) error {
 	for i, cat := range expectedCategories {
-		token, err := p.nextToken()
+		token, err := p.scanner.NextToken()
+		// scanner error, so we will already be reading the next line at this point
 		if err != nil {
 			return err
 		}
@@ -88,15 +89,19 @@ func (p *parser) buildCategories(expectedCategories []m.SyntacticCategory, expec
 		// check the special case of EO
 		if cat == c.EO {
 			if tokenCat != c.EOL && tokenCat != c.EOF {
+				// this makes a new line in the scanner because a parser error does not start a new line in the scanner
+				p.scanner.SetNextLine()
 				return fmt.Errorf("encountered an error at line %d: expected a token of type EOF or EOF but got one of type %v", token.LineNumber, c.SyntacticCategories[tokenCat])
 			}
 		} else if tokenCat != cat {
-			return tokenError(token.Category, cat, token)
+			p.scanner.SetNextLine()
+			return parserError(token.Category, cat, token)
 		}
 
 		arg := expectedArgs[i]
 		err = p.buildOperation(token, arg)
 		if err != nil {
+			p.scanner.SetNextLine()
 			return fmt.Errorf("encountered an error at token %v: %w", token, err)
 		}
 	}

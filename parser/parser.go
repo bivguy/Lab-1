@@ -17,6 +17,7 @@ type parser struct {
 
 type scanner interface {
 	NextToken() (models.Token, error)
+	SetNextLine()
 }
 
 func New(scanner scanner) *parser {
@@ -24,11 +25,7 @@ func New(scanner scanner) *parser {
 }
 
 func (p *parser) Parse() (*list.List, error) {
-	token, err := p.nextOperationToken()
-
-	if err != nil {
-		return nil, err
-	}
+	token := p.nextOperationToken()
 
 	// once we get a valid lexeme, start building the internal representation
 	p.currentOperation.Line = token.LineNumber
@@ -36,36 +33,25 @@ func (p *parser) Parse() (*list.List, error) {
 
 	// calls the corresponding helper function to finish building its operation
 	for token.Category != c.EOF {
+		var err error
 		switch token.Category {
 		case c.MEMOP:
 			err = p.finishMemop()
-			if err != nil {
-				return nil, err
-			}
 
 			p.operations.PushFront(p.currentOperation)
 			p.currentOperation = m.OperationNode{}
 		case c.LOADI:
 			err = p.finishLoadI()
-			if err != nil {
-				return nil, err
-			}
 
 			p.operations.PushFront(p.currentOperation)
 			p.currentOperation = m.OperationNode{}
 		case c.ARITHOP:
 			err = p.finishArithop()
-			if err != nil {
-				return nil, err
-			}
 
 			p.operations.PushFront(p.currentOperation)
 			p.currentOperation = m.OperationNode{}
 		case c.OUTPUT:
 			err = p.finishOutput()
-			if err != nil {
-				return nil, err
-			}
 			p.operations.PushFront(p.currentOperation)
 			p.currentOperation = m.OperationNode{}
 		case c.NOP:
@@ -77,60 +63,50 @@ func (p *parser) Parse() (*list.List, error) {
 			p.currentOperation = m.OperationNode{}
 		default:
 			p.currentOperation = m.OperationNode{}
-			return nil, fmt.Errorf("expected a valid opcode category but instead got %v", token)
+			err = fmt.Errorf("expected a valid opcode category but instead got %v", token)
 		}
 
-		token, err = p.nextOperationToken()
 		if err != nil {
-			p.currentOperation = m.OperationNode{}
-			return nil, scannerError(err)
+			fmt.Printf("%v\n", err)
 		}
+
+		token = p.nextOperationToken()
 	}
 
-	return p.operations, err
+	return p.operations, nil
 
 }
 
-// helper function that wraps around the scanner's nextToken so that it ommits comments
-func (p *parser) nextToken() (m.Token, error) {
+// helper function that gets the next token from the scanner that did not return any errors
+func (p *parser) nextCorrectToken() m.Token {
 	token, err := p.scanner.NextToken()
-	if err != nil {
-		return m.Token{}, scannerError(err)
-	}
 
-	for token.Category == c.COMMENT {
+	// keep printing out the errors of the scanner if they occur
+	for err != nil {
+		fmt.Printf("error: %v\n", scannerError(err))
 		token, err = p.scanner.NextToken()
-		if err != nil {
-			return m.Token{}, scannerError(err)
-		}
 	}
 
-	return token, err
+	return token
 }
 
-func (p *parser) nextOperationToken() (m.Token, error) {
-	token, err := p.nextToken()
-	if err != nil {
-		return m.Token{}, scannerError(err)
-	}
+// skips all comments and EOL tokens and returns a token that can actually be used in the parser
+func (p *parser) nextOperationToken() m.Token {
+	token := p.nextCorrectToken()
 
 	for token.Category == c.EOL {
-		token, err = p.scanner.NextToken()
-		if err != nil {
-			return m.Token{}, scannerError(err)
-		}
+		token = p.nextCorrectToken()
 	}
 
-	return token, err
-
+	return token
 }
 
 // indicates that there is an error with the scanner's nextToken
 func scannerError(err error) error {
-	return fmt.Errorf("encountered in retrieving next token: %w", err)
+	return fmt.Errorf("scanner encountered in retrieving next token: %w", err)
 }
 
-func tokenError(expected m.SyntacticCategory, recieved m.SyntacticCategory, token m.Token) error {
-	return fmt.Errorf("encountered an error at line %d: expected a token of type %v but got one of type %v", token.LineNumber, c.SyntacticCategories[expected], c.SyntacticCategories[recieved])
+func parserError(expected m.SyntacticCategory, recieved m.SyntacticCategory, token m.Token) error {
+	return fmt.Errorf("parser encountered an error at line %d: expected a token of type %v but got one of type %v", token.LineNumber, c.SyntacticCategories[expected], c.SyntacticCategories[recieved])
 
 }
