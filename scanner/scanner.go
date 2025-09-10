@@ -96,7 +96,7 @@ func (s *scanner) NextToken() (models.Token, error) {
 		case c == 'u':
 			category, err = s.subHelper()
 		default:
-			err = fmt.Errorf("invalid instruction: letter 't' or 'u' expected but found %q at line %d", c, s.lineNumber)
+			err = fmt.Errorf("scanner invalid instruction: letter 't' or 'u' expected but found %q at line %d", c, s.lineNumber)
 		}
 	case c == 'a':
 		category, err = s.addHelper()
@@ -145,7 +145,7 @@ func (s *scanner) NextToken() (models.Token, error) {
 
 	if err != nil {
 		s.lineEnd = true
-		// return token{Category: category, Lexeme: ""}, err
+		err = fmt.Errorf("scanner error at line %d: %w ", s.lineNumber, err)
 	}
 
 	lexeme = s.lineText[s.startIdx : s.curIdx+1]

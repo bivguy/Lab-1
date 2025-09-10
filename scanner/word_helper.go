@@ -55,14 +55,14 @@ func (s *scanner) outputHelper() (models.SyntacticCategory, error) {
 		}
 		return category, errors.New("invalid output instruction: letter 'u' expected but found " + string(c))
 	}
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 't' {
 		if err != nil {
 			s.curIdx--
 		}
 		return category, errors.New("invalid output instruction: letter 't' expected but found " + string(c))
 	}
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'p' {
 		if err != nil {
 			s.curIdx--
@@ -70,7 +70,7 @@ func (s *scanner) outputHelper() (models.SyntacticCategory, error) {
 		return category, errors.New("invalid output instruction: letter 'p' expected but found " + string(c))
 	}
 
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'u' {
 		if err != nil {
 			s.curIdx--
@@ -78,7 +78,7 @@ func (s *scanner) outputHelper() (models.SyntacticCategory, error) {
 		return category, errors.New("invalid output instruction: letter 'u' expected but found " + string(c))
 	}
 
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 't' {
 		if err != nil {
 			s.curIdx--
@@ -102,14 +102,14 @@ func (s *scanner) storeHelper() (models.SyntacticCategory, error) {
 		}
 		return category, errors.New("invalid store instruction: letter 'o' expected but found " + string(c))
 	}
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'r' {
 		if err != nil {
 			s.curIdx--
 		}
 		return category, errors.New("invalid store instruction: letter 'r' expected but found " + string(c))
 	}
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'e' {
 		if err != nil {
 			s.curIdx--
@@ -152,7 +152,7 @@ func (s *scanner) addHelper() (models.SyntacticCategory, error) {
 		return category, errors.New("invalid add instruction: letter 'd' expected but found " + string(c))
 	}
 
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'd' {
 		if err != nil {
 			s.curIdx--
@@ -178,7 +178,7 @@ func (s *scanner) multHelper() (models.SyntacticCategory, error) {
 		return category, errors.New("invalid mult instruction: letter 'u' expected but found " + string(c))
 	}
 
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'l' {
 		if err != nil {
 			s.curIdx--
@@ -186,7 +186,7 @@ func (s *scanner) multHelper() (models.SyntacticCategory, error) {
 		return category, errors.New("invalid mult instruction: letter 'l' expected but found " + string(c))
 	}
 
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 't' {
 		if err != nil {
 			s.curIdx--
@@ -210,21 +210,21 @@ func (s *scanner) rshiftHelper() (models.SyntacticCategory, error) {
 		}
 		return category, errors.New("invalid rshift instruction: letter 'h' expected but found " + string(c))
 	}
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'i' {
 		if err != nil {
 			s.curIdx--
 		}
 		return category, errors.New("invalid rshift instruction: letter 'i' expected but found " + string(c))
 	}
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'f' {
 		if err != nil {
 			s.curIdx--
 		}
 		return category, errors.New("invalid rshift instruction: letter 'f' expected but found " + string(c))
 	}
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 't' {
 		if err != nil {
 			s.curIdx--
@@ -249,7 +249,7 @@ func (s *scanner) loadHelper() (models.SyntacticCategory, error) {
 		return category, errors.New("invalid load instruction: letter 'a' expected but found " + string(c))
 	}
 
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'd' {
 		if err != nil {
 			s.curIdx--
@@ -294,7 +294,7 @@ func (s *scanner) nopHelper() (models.SyntacticCategory, error) {
 		return category, errors.New("invalid nop instruction: letter 'o' expected but found " + string(c))
 	}
 
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'p' {
 		if err != nil {
 			s.curIdx--
