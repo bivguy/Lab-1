@@ -17,14 +17,14 @@ func (s *scanner) lshiftHelper() (models.SyntacticCategory, error) {
 		}
 		return category, errors.New("invalid lshift instruction: letter 'h' expected but found " + string(c))
 	}
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'i' {
 		if err != nil {
 			s.curIdx--
 		}
 		return category, errors.New("invalid lshift instruction: letter 'i' expected but found " + string(c))
 	}
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 'f' {
 		if err != nil {
 			s.curIdx--
@@ -32,7 +32,7 @@ func (s *scanner) lshiftHelper() (models.SyntacticCategory, error) {
 		return category, errors.New("invalid lshift instruction: letter 'f' expected but found " + string(c))
 
 	}
-	c, _ = s.next()
+	c, err = s.next()
 	if c != 't' {
 		if err != nil {
 			s.curIdx--

@@ -16,6 +16,10 @@ func TestSimpleParserTestCases(t *testing.T) {
 	}
 }
 
+func TestParserPerformance(t *testing.T) {
+
+}
+
 func runTest(tc TestCase, t *testing.T) {
 	file, err := os.Open(tc.input)
 	if err != nil {

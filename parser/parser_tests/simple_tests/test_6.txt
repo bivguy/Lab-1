@@ -1,0 +1,3 @@
+loadI 12 =>=> r0
+r
+output 4

@@ -1,0 +1,4 @@
+//NAME: Bivan Shrestha
+//NETID: bs81
+
+to build, simply run `make clean` followed by `make build`. To do those two commands togethar, run `make clean-build`. 

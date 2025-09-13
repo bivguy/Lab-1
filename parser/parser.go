@@ -102,5 +102,5 @@ func scannerError(err error) error {
 }
 
 func parserError(expected m.SyntacticCategory, recieved m.SyntacticCategory, token m.Token) error {
-	return fmt.Errorf("parser encountered an error at line %d: expected a token of type %v but got one of type %v", token.LineNumber, c.SyntacticCategories[expected], c.SyntacticCategories[recieved])
+	return fmt.Errorf("parser encountered an error at line %d: expected a token of type %v but got one of type %v", token.LineNumber, c.SyntacticCategories[recieved], c.SyntacticCategories[expected])
 }

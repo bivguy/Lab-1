@@ -47,7 +47,10 @@ func main() {
 
 		// print the results of the parser's Intermediate Representation in a human readable format
 		if *rFlag != "" {
-			fmt.Println(PrettyPrintIR(IR))
+			// we only print the IR there is no error found
+			if !parser.ErrorFound {
+				fmt.Println(PrettyPrintIR(IR))
+			}
 		} else { // *p flag
 			if parser.ErrorFound || err != nil {
 				fmt.Println("Parse found errors")

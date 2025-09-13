@@ -92,6 +92,21 @@ var simpleTestCases = []TestCase{
 			return ir
 		}(), expectedError: false,
 	},
+	{
+		description: "testing some invalid file",
+		input:       "parser_tests/simple_tests/test_6.txt",
+		expectedIR: func() *list.List {
+			ir := list.New()
+
+			ir.PushBack(m.OperationNode{
+				Line:    3,
+				Opcode:  "output",
+				OpThree: m.Operand{SR: 4},
+			})
+
+			return ir
+		}(), expectedError: true,
+	},
 }
 
 var complexTestCases = []TestCase{

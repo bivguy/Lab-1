@@ -96,7 +96,7 @@ func (s *scanner) NextToken() (models.Token, error) {
 		case c == 'u':
 			category, err = s.subHelper()
 		default:
-			err = fmt.Errorf("scanner invalid instruction: letter 't' or 'u' expected but found %q at line %d", c, s.lineNumber)
+			err = fmt.Errorf("scanner invalid instruction: found %q at line %d", c, s.lineNumber)
 		}
 	case c == 'a':
 		category, err = s.addHelper()
@@ -133,6 +133,9 @@ func (s *scanner) NextToken() (models.Token, error) {
 		// if the next letter is a digit, it must be a register
 		case c >= '0' && c <= '9':
 			category, err = s.registerHelper(c)
+		default:
+			err = fmt.Errorf("scanner invalid instruction: letter 't' or 'u' expected but found %q at line %d", c, s.lineNumber)
+
 		}
 	default:
 		// check if the starting character is a integer (for constants)
