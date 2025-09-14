@@ -76,7 +76,6 @@ func (s *scanner) NextToken() (models.Token, error) {
 			err = errors.New("invalid instruction: letter 'o' or 's' expected but found " + string(c))
 		}
 	case c == '\r': // TODO: this operates under the assumption that a \n will follow and that this is only in windows
-	
 		category = EOL
 		s.lineEnd = true
 	case c == '\n':

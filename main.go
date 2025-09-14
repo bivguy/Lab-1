@@ -23,7 +23,7 @@ func main() {
 
 	// politely report that only a single flag should be passed in
 	if flag.NFlag() > 1 {
-		fmt.Fprintln(os.Stderr, "Only one flag should be passed at a time; using highest priority (-h, -r, -p, -s).")
+		fmt.Fprintln(os.Stderr, "Only one flag should be passed at a time; using highest priority (-h, -r, -p, -s).\n")
 	}
 
 	if *hFlag {
@@ -33,31 +33,30 @@ func main() {
 
 	// filename
 	args := flag.Args()
+	if len(args) == 0 {
+		fmt.Fprintln(os.Stderr, "ERROR: missing <filename>")
+		helpMessage()
+		return
+	}
+
+	if len(args) > 1 {
+		fmt.Fprintln(os.Stderr, "ERROR: Attempt to open more than one input file.")
+		helpMessage()
+		return
+	}
+
+	path := args[0]
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: Failed to open file: %v\n", err)
+		helpMessage()
+		return
+	}
+	defer file.Close()
+	scanner := scanner.New(file)
+	parser := parser.New(scanner)
 
 	if *sFlag || *pFlag || *rFlag {
-		if len(args) == 0 {
-			fmt.Fprintln(os.Stderr, "ERROR: missing <filename>")
-			helpMessage()
-			return
-		}
-
-		if len(args) > 1 {
-			fmt.Fprintln(os.Stderr, "ERROR: Attempt to open more than one input file.")
-			helpMessage()
-			return
-		}
-
-		path := args[0]
-		file, err := os.Open(path)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "ERROR: Failed to open file: %v\n", err)
-			helpMessage()
-			return
-		}
-		defer file.Close()
-		scanner := scanner.New(file)
-		parser := parser.New(scanner)
-
 		if *rFlag {
 			IR, err := parser.Parse()
 			// we only print the IR there is no error found
@@ -84,14 +83,14 @@ func main() {
 					break
 				}
 			}
+		}
+	} else {
+		// default behavior is of pflag
+		IR, err := parser.Parse()
+		if parser.ErrorFound || err != nil {
+			fmt.Println("Parse found errors")
 		} else {
-			// default behavior is of pflag
-			IR, err := parser.Parse()
-			if parser.ErrorFound || err != nil {
-				fmt.Println("Parse found errors")
-			} else {
-				fmt.Printf("Parse succeeded. Processed %d operations.\n", IR.Len())
-			}
+			fmt.Printf("Parse succeeded. Processed %d operations.\n", IR.Len())
 		}
 	}
 }

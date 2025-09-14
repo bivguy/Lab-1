@@ -30,7 +30,7 @@ type OperationNode struct {
 
 func (op OperationNode) String() string {
 	return fmt.Sprintf(
-		"Line %d: %s %v %v %v",
+		"Line %d: OpCode: %s; Operand One: %v; Operand Two: %v; Operand Three: %v",
 		op.Line,
 		op.Opcode,
 		op.OpOne,
