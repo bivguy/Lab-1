@@ -83,8 +83,6 @@ func (p *parser) nextCorrectToken() m.Token {
 	return token
 }
 
-// TODO: create some helper function that makes the default operand SR values to be -1
-
 // skips all comments and EOL tokens and returns a token that can actually be used in the parser
 func (p *parser) nextOperationToken() m.Token {
 	token := p.nextCorrectToken()

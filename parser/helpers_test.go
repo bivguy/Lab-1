@@ -13,6 +13,12 @@ type TestCase struct {
 	expectedError bool
 }
 
+type PerformanceTestCase struct {
+	description   string
+	input         string
+	MaximumTimeMs int64
+}
+
 var simpleTestCases = []TestCase{
 	{
 		description: "simple MEMOP test",
@@ -141,5 +147,13 @@ var complexTestCases = []TestCase{
 
 			return ir
 		}(), expectedError: false,
+	},
+}
+
+var performanceTestCases = []PerformanceTestCase{
+	{
+		description:   "Performance Test 1",
+		input:         "parser_tests/complex_tests/t128k.i.txt",
+		MaximumTimeMs: 200,
 	},
 }

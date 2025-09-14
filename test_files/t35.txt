@@ -1,0 +1,5 @@
+loadI 12 => r1 // load immediate
+add r1, r2 => r3 // add two registers
+mult r3, r4 => r5 // multiply
+output 5 // output constant
+nop // do nothing

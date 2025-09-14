@@ -1,0 +1,6 @@
+loadX 12 => r1
+add r1 r2 => r3
+mult r1, r2 = r3
+store r1 =>
+output r1, r2
+nop r1

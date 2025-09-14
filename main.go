@@ -16,74 +16,85 @@ import (
 func main() {
 	hFlag := flag.Bool("h", false, "Display help")
 
-	sFlag := flag.String("s", "", "Display the Scanner Output")
-	pFlag := flag.String("p", "", "Display the Parser Output")
-	rFlag := flag.String("r", "", "Display the Intermediate Representation Output")
+	sFlag := flag.Bool("s", false, "Display the Scanner Output")
+	pFlag := flag.Bool("p", false, "Display the Parser Output")
+	rFlag := flag.Bool("r", false, "Display the Intermediate Representation Output")
 	flag.Parse()
 
 	// politely report that only a single flag should be passed in
 	if flag.NFlag() > 1 {
-
+		fmt.Fprintln(os.Stderr, "Only one flag should be passed at a time; using highest priority (-h, -r, -p, -s).")
 	}
 
 	if *hFlag {
 		helpMessage()
-	} else if *rFlag != "" || *pFlag != "" {
+		return
+	}
 
-		path := *rFlag
-		if path == "" {
-			path = *pFlag
+	// filename
+	args := flag.Args()
+
+	if *sFlag || *pFlag || *rFlag {
+		if len(args) == 0 {
+			fmt.Fprintln(os.Stderr, "ERROR: missing <filename>")
+			helpMessage()
+			return
 		}
 
+		if len(args) > 1 {
+			fmt.Fprintln(os.Stderr, "ERROR: Attempt to open more than one input file.")
+			helpMessage()
+			return
+		}
+
+		path := args[0]
 		file, err := os.Open(path)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Failed to open file: %v\n", err)
+			helpMessage()
 			return
 		}
 		defer file.Close()
 		scanner := scanner.New(file)
 		parser := parser.New(scanner)
-		IR, err := parser.Parse()
 
-		// print the results of the parser's Intermediate Representation in a human readable format
-		if *rFlag != "" {
+		if *rFlag {
+			IR, err := parser.Parse()
 			// we only print the IR there is no error found
-			if !parser.ErrorFound {
+			if !parser.ErrorFound && err == nil {
 				fmt.Println(PrettyPrintIR(IR))
+			} else {
+				fmt.Println("\nDue to the syntax error, run terminates.")
 			}
-		} else { // *p flag
+		} else if *pFlag {
+			IR, err := parser.Parse()
 			if parser.ErrorFound || err != nil {
 				fmt.Println("Parse found errors")
 			} else {
 				fmt.Printf("Parse succeeded. Processed %d operations.\n", IR.Len())
 			}
-
-		}
-
-	} else if *sFlag != "" { // opening a file and outputting all the results of the scanner
-		file, err := os.Open(*sFlag)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "ERROR: Failed to open file: %v\n", err)
-			return
-		}
-		defer file.Close()
-		scanner := scanner.New(file)
-		for {
-			tok, err := scanner.NextToken()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "ERROR %d: Unexpected error: %v\n", tok.LineNumber, err)
-				break
+		} else if *sFlag {
+			for {
+				tok, err := scanner.NextToken()
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "ERROR %d: Unexpected error: %v\n", tok.LineNumber, err)
+				}
+				scanner.PrintToken(tok)
+				if tok.Category == c.EOF {
+					break
+				}
 			}
-			scanner.PrintToken(tok)
-			if tok.Category == c.EOF {
-				break
+
+		} else {
+			// default behavior is of pflag
+			IR, err := parser.Parse()
+			if parser.ErrorFound || err != nil {
+				fmt.Println("Parse found errors")
+			} else {
+				fmt.Printf("Parse succeeded. Processed %d operations.\n", IR.Len())
 			}
 		}
-
-	} else { // pflag is the default behavior
-
 	}
-
 }
 
 // helpMessage prints to the command line all the possible commands for the 412fe applications
@@ -97,6 +108,7 @@ func helpMessage() {
 	fmt.Println("  -s <filename>\t Read the specified file, scan it, and print a list of tokens.")
 	fmt.Println("  -p <filename>\t Read the specified file, scan it, parse it, and report success or failure.")
 	fmt.Println("  -r <filename>\t Read the specified file, scan it, parse it, and print the intermediate representation.")
+	fmt.Println("No flag provided: behaves as if -p <filename> was specified.")
 }
 
 func PrettyPrintIR(ir *list.List) string {

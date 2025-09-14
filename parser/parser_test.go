@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"os"
 	"testing"
+	"time"
 
 	s "github.com/bivguy/Comp412/scanner"
 )
@@ -17,6 +18,31 @@ func TestSimpleParserTestCases(t *testing.T) {
 }
 
 func TestParserPerformance(t *testing.T) {
+	for _, tc := range performanceTestCases {
+		t.Run(tc.description, func(t *testing.T) {
+			start := time.Now()
+
+			file, err := os.Open(tc.input)
+			if err != nil {
+				t.Fatalf("Failed to open file: %v", err)
+			}
+			defer file.Close()
+
+			scanner := s.New(file)
+			parser := New(scanner)
+
+			_, err = parser.Parse()
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
+
+			duration := time.Since(start)
+
+			if duration.Milliseconds() > tc.MaximumTimeMs {
+				t.Errorf("Performance test failed: took %d ms, expected maximum %d ms", duration.Milliseconds(), tc.MaximumTimeMs)
+			}
+		})
+	}
 
 }
 

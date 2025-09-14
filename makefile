@@ -4,7 +4,7 @@ PKG ?= .              # Go package to build (default for this is current directo
 NETID ?= bs81
 TARFILE ?= ../$(NETID).tar
 
-# Exclusions for the submission tarball
+# Exclusions 
 TAR_EXCLUDES := \
   --exclude='*_test.go' \
   --exclude='testdata' \
