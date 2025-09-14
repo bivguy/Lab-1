@@ -15,10 +15,10 @@ import (
 
 func main() {
 	hFlag := flag.Bool("h", false, "Display help")
-
 	sFlag := flag.Bool("s", false, "Display the Scanner Output")
 	pFlag := flag.Bool("p", false, "Display the Parser Output")
 	rFlag := flag.Bool("r", false, "Display the Intermediate Representation Output")
+
 	flag.Parse()
 
 	// politely report that only a single flag should be passed in
@@ -84,7 +84,6 @@ func main() {
 					break
 				}
 			}
-
 		} else {
 			// default behavior is of pflag
 			IR, err := parser.Parse()

@@ -1,4 +1,20 @@
 //NAME: Bivan Shrestha
 //NETID: bs81
 
-to build, simply run `make clean` followed by `make build`. To do those two commands togethar, run `make clean-build`. 
+To build, simply run `make clean` followed by `make build`. 
+
+To do those two commands togethar, run `make clean-build`. 
+
+To create a tar file, run `make tar` and it will be created at the top level directory.
+
+Contents of the tar:
+    ./main.go                 – entry point, command-line handling
+    ./scanner/scanner.go      – scanner implementation
+    ./scanner/word_helper.go  – helper functions for scanner
+    ./parser/parser.go        – parser implementation
+    ./parser/parser_helper.go – helper functions for parser
+    ./models/models.go        – data structures for tokens, operations
+    ./constants/constants.go  – syntactic categories and constants
+    ./makefile                – build rules (clean, build, clean-build, tar)
+    ./README                  – this file
+    ./go.mod                  – Go module definition

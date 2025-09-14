@@ -49,8 +49,6 @@ wrong-parse:
 
 tar: clean
 	@tar $(TAR_EXCLUDES) -cvf $(TARFILE) .
-	@echo ">> contents:"
-
 
 
 
