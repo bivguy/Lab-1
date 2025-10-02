@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 
 	c "github.com/bivguy/Comp412/constants"
@@ -136,7 +137,7 @@ func (p *parser) buildOperation(token m.Token, arg category) error {
 
 	op.SR = SR
 	op.VR = -1
-	op.NU = -1
+	op.NU = math.Inf(1)
 
 	return nil
 }

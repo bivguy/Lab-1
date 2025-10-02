@@ -51,7 +51,7 @@ tar: clean
 
 # commands for lab 2
 
-default-rename:
+default-rename: clean-build
 	./412fe -x test_files/rename.txt
 
 

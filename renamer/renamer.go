@@ -2,6 +2,7 @@ package renamer
 
 import (
 	"container/list"
+	"fmt"
 	"math"
 
 	m "github.com/bivguy/Comp412/models"
@@ -9,7 +10,7 @@ import (
 
 type renamer struct {
 	SRToVR []int
-	LU     []int // SWITCH TO SLICES AT SOME POINT
+	LU     []float64 // SWITCH TO SLICES AT SOME POINT
 	maxSR  int
 	index  int
 	IR     *list.List
@@ -17,11 +18,11 @@ type renamer struct {
 
 func New(maxSR int, IR *list.List) *renamer {
 	SRToVR := make([]int, maxSR+1)
-	LU := make([]int, maxSR+1)
+	LU := make([]float64, maxSR+1)
 
 	for i := 0; i <= maxSR; i++ {
 		SRToVR[i] = -1
-		LU[i] = -1
+		LU[i] = math.Inf(1)
 	}
 
 	return &renamer{
@@ -38,9 +39,10 @@ func (r *renamer) Rename() *list.List {
 	// var liveMap map[]
 	// go through the IR in reverse order
 	for node := r.IR.Back(); node != nil; node = node.Prev() {
-		op := node.Value.(m.OperationNode)
+		op := node.Value.(*m.OperationNode)
 
 		if op.Opcode == "nop" {
+			r.index--
 			continue
 		}
 
@@ -50,9 +52,12 @@ func (r *renamer) Rename() *list.List {
 		for i, o := range operandList {
 			// skip if its not active or if its not definiition
 			if !o.Active || !isRegister(op.Opcode, i) || !isDefinition(op.Opcode, i) {
-				r.index--
 				continue
 			}
+
+			fmt.Print("at a load with a definitions\n")
+			fmt.Print(o)
+			fmt.Print("\n\n")
 
 			if r.SRToVR[o.SR] == -1 {
 				r.SRToVR[o.SR] = vrName
@@ -63,7 +68,7 @@ func (r *renamer) Rename() *list.List {
 			o.NU = r.LU[o.SR]
 
 			r.SRToVR[o.SR] = -1
-			r.LU[o.SR] = int(math.Inf(1))
+			r.LU[o.SR] = math.Inf(1)
 		}
 
 		// go through each operand that is used
@@ -89,12 +94,17 @@ func (r *renamer) Rename() *list.List {
 				continue
 			}
 
-			r.LU[o.SR] = r.index
+			r.LU[o.SR] = float64(r.index)
 		}
+		fmt.Println("Updated some things:")
+		fmt.Println(r.SRToVR)
+		fmt.Println(r.LU)
 
 		r.index--
 	}
 
+	fmt.Println(r.SRToVR)
+	fmt.Println(r.LU)
 	return r.IR
 }
 

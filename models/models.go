@@ -19,11 +19,14 @@ func (t Token) String() string {
 type Operand struct {
 	SR     int
 	VR     int
-	NU     int
+	NU     float64
 	Active bool
 }
 
 func (op Operand) String() string {
+	if !op.Active {
+		return "[ Inactive Operand ]"
+	}
 	return fmt.Sprintf("[SR=%d, VR=%d, NU=%d, Active=%t]", op.SR, op.VR, op.NU, op.Active)
 }
 

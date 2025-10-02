@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	c "github.com/bivguy/Comp412/constants"
 	m "github.com/bivguy/Comp412/models"
@@ -97,7 +98,7 @@ func main() {
 
 			renamedIR := renamer.Rename()
 			fmt.Println("about to print")
-			fmt.Println(PrettyPrintIR(renamedIR))
+			fmt.Println(renameIR(renamedIR))
 		}
 	} else {
 		// default behavior is of pflag
@@ -131,8 +132,60 @@ func PrettyPrintIR(ir *list.List) string {
 
 	result := ""
 	for e := ir.Front(); e != nil; e = e.Next() {
-		op := e.Value.(m.OperationNode)
+		op := e.Value.(*m.OperationNode)
 		result += fmt.Sprintf("%s\n\n", op)
 	}
 	return result
+}
+
+func renameIR(ir *list.List) string {
+	var b strings.Builder
+
+	for e := ir.Front(); e != nil; e = e.Next() {
+		var op *m.OperationNode
+		switch v := e.Value.(type) {
+		case *m.OperationNode:
+			op = v
+		case m.OperationNode:
+			// safe: we only read fields to format
+			tmp := v
+			op = &tmp
+		default:
+			continue
+		}
+
+		switch op.Opcode {
+		// ARITH (two uses, one def)
+		case "add", "mult": // add rA,rB => rC
+			fmt.Fprintf(&b, "%s r%d,r%d => r%d\n",
+				op.Opcode, op.OpOne.VR, op.OpTwo.VR, op.OpThree.VR)
+
+		// LOAD variants
+		case "load": // load rAddr => rDst
+			fmt.Fprintf(&b, "load r%d => r%d\n",
+				op.OpOne.VR, op.OpThree.VR)
+
+		case "loadI":
+			fmt.Fprintf(&b, "loadI %d => r%d\n",
+				op.OpOne.SR, op.OpThree.VR)
+
+		// STORE (two uses, no def)
+		case "store": // store rVal => rAddr
+			fmt.Fprintf(&b, "store r%d => r%d\n",
+				op.OpOne.VR, op.OpThree.VR)
+
+		// OUTPUT
+		case "output": // output => rX
+			fmt.Fprintf(&b, "output => r%d\n", op.OpThree.VR)
+
+		// NOP
+		case "nop":
+			fmt.Fprintln(&b, "nop")
+
+		default:
+			fmt.Fprintf(&b, "%s ???\n", op.Opcode)
+		}
+	}
+
+	return b.String()
 }
