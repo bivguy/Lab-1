@@ -7,6 +7,37 @@ To do those two commands togethar, run `make clean-build`.
 
 To create a tar file, run `make tar` and it will be created at the top level directory.
 
+Usage:
+    ./412fe [flags] <filename>
+
+Flags (Should be mutually exclusive; priority: -h > -r > -p > -s):
+
+  -h
+      Displays a help message describing all valid command-line options.
+      
+      If -h is present, the program ignores all other flags and arguments.
+
+  -s <filename>
+      This is simply Scanner mode. Reads the specified file and prints, to stdout, a list of all tokens found.
+      
+      Each token is shown with its line number, its syntactic category, and its lexeme (spelling).
+
+  -p <filename>
+      Parser mode. Reads the specified file, scans it, parses it, and builds the intermediate representation.
+        • If the parse succeeds, prints:
+            `Parse succeeded. Processed k operations.`
+          where k is the number of operations handled.
+        • If the parse finds errors, prints:
+            `Parse found errors` with error messages written to stderr.
+
+  -r <filename>
+      IR mode. Reads the specified file, scans it, parses it, builds the intermediate representation, and prints the representation in a human-readable format to stdout.
+      
+      If parsing fails, error messages are written to stderr and the IR is not printed.
+
+Default behavior:
+    If no flag is specified, the program behaves as if -p <filename> was provided.
+
 Contents of the tar:
     ./main.go                 – entry point, command-line handling
     ./scanner/scanner.go      – scanner implementation

@@ -135,6 +135,13 @@ func (p *parser) buildOperation(token m.Token, arg category) error {
 
 	op.Active = true
 
+	// set the largest register size
+	if lexeme[0] == 'r' {
+		if SR > p.largestRegister {
+			p.largestRegister = SR
+		}
+	}
+
 	op.SR = SR
 	op.VR = -1
 	op.NU = math.Inf(1)
@@ -156,4 +163,12 @@ func (p *parser) sourceRegisterHelper(lexeme string) (int, error) {
 	}
 
 	return SR, nil
+}
+
+func isRegister(opcode string, cat category) bool {
+	if (opcode == "loadI" && cat == OPONE) || (opcode == "output" && cat == OPTHREE) {
+		return false
+	}
+
+	return true
 }

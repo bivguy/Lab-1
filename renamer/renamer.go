@@ -2,7 +2,6 @@ package renamer
 
 import (
 	"container/list"
-	"fmt"
 	"math"
 
 	m "github.com/bivguy/Comp412/models"
@@ -41,7 +40,7 @@ func (r *renamer) Rename() *list.List {
 	for node := r.IR.Back(); node != nil; node = node.Prev() {
 		op := node.Value.(*m.OperationNode)
 
-		if op.Opcode == "nop" {
+		if op.Opcode == "nop" || op.Opcode == "output" {
 			r.index--
 			continue
 		}
@@ -54,10 +53,6 @@ func (r *renamer) Rename() *list.List {
 			if !o.Active || !isRegister(op.Opcode, i) || !isDefinition(op.Opcode, i) {
 				continue
 			}
-
-			fmt.Print("at a load with a definitions\n")
-			fmt.Print(o)
-			fmt.Print("\n\n")
 
 			if r.SRToVR[o.SR] == -1 {
 				r.SRToVR[o.SR] = vrName
@@ -96,15 +91,10 @@ func (r *renamer) Rename() *list.List {
 
 			r.LU[o.SR] = float64(r.index)
 		}
-		fmt.Println("Updated some things:")
-		fmt.Println(r.SRToVR)
-		fmt.Println(r.LU)
 
 		r.index--
 	}
 
-	fmt.Println(r.SRToVR)
-	fmt.Println(r.LU)
 	return r.IR
 }
 
@@ -118,7 +108,7 @@ func isDefinition(opcode string, i int) bool {
 }
 
 func isRegister(opcode string, i int) bool {
-	if opcode == "loadI" && i == 0 {
+	if (opcode == "loadI" && i == 0) || (opcode == "output" && i == 2) {
 		return false
 	}
 

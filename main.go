@@ -94,10 +94,11 @@ func main() {
 				return
 			}
 
-			renamer := renamer.New(6, IR)
+			largestRegister := parser.GetLargestRegister()
+
+			renamer := renamer.New(largestRegister, IR)
 
 			renamedIR := renamer.Rename()
-			fmt.Println("about to print")
 			fmt.Println(renameIR(renamedIR))
 		}
 	} else {
@@ -156,7 +157,7 @@ func renameIR(ir *list.List) string {
 
 		switch op.Opcode {
 		// ARITH (two uses, one def)
-		case "add", "mult": // add rA,rB => rC
+		case "add", "mult", "sub", "lshift", "rshift": // add rA,rB => rC
 			fmt.Fprintf(&b, "%s r%d,r%d => r%d\n",
 				op.Opcode, op.OpOne.VR, op.OpTwo.VR, op.OpThree.VR)
 
@@ -176,11 +177,14 @@ func renameIR(ir *list.List) string {
 
 		// OUTPUT
 		case "output": // output => rX
-			fmt.Fprintf(&b, "output => r%d\n", op.OpThree.VR)
+			fmt.Fprintf(&b, "output => %d\n", op.OpThree.SR)
 
 		// NOP
 		case "nop":
-			fmt.Fprintln(&b, "nop")
+			fmt.Fprintf(&b, "nop\n")
+		// case "lshift":
+
+		// case "rshift":
 
 		default:
 			fmt.Fprintf(&b, "%s ???\n", op.Opcode)

@@ -14,6 +14,7 @@ type parser struct {
 	scanner          scanner
 	currentOperation m.OperationNode
 	operations       *list.List
+	largestRegister  int
 	ErrorFound       bool
 }
 
@@ -93,6 +94,10 @@ func (p *parser) nextOperationToken() m.Token {
 	}
 
 	return token
+}
+
+func (p *parser) GetLargestRegister() int {
+	return p.largestRegister
 }
 
 // indicates that there is an error with the scanner's nextToken

@@ -1,6 +1,6 @@
 # ---- config ----
-BIN := 412fe          # The executable name the autograder expects
-PKG ?= .              # Go package to build (default for this is current directory)
+BIN := 412alloc          # The executable name the autograder expects
+PKG ?= .                  # Go package to build (default for this is current directory)
 NETID ?= bs81
 TARFILE ?= ../$(NETID).tar
 
@@ -38,13 +38,13 @@ clean-build:
 	go build -o $(BIN) $(PKG)
 
 default-scan:
-	./412fe -s test_files/ex1.txt
+	./$(BIN) -s test_files/ex1.txt
 
 default-parse:
-	./412fe -r test_files/ex1.txt
+	./$(BIN) -r test_files/ex1.txt
 
 wrong-parse:
-	./412fe -r test_files/Holmes.txt
+	./$(BIN) -r test_files/Holmes.txt
 
 tar: clean
 	@tar $(TAR_EXCLUDES) -cvf $(TARFILE) .
@@ -52,7 +52,20 @@ tar: clean
 # commands for lab 2
 
 default-rename: clean-build
-	./412fe -x test_files/rename.txt
+	./$(BIN) -x test_files/rename.txt
 
+ccOne: clean-build
+	./$(BIN) -x test_files/cc1.txt
 
+ccTwo: clean-build
+	./$(BIN) -x test_files/cc2.i
+
+ccThree: clean-build
+	./$(BIN) -x test_files/cc3.i
+
+ccFour: clean-build
+	./$(BIN) -x test_files/cc4.i
+
+ccFive: clean-build
+	./$(BIN) -x test_files/cci.i
 
