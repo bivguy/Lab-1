@@ -122,14 +122,21 @@ func (p *parser) buildOperation(token m.Token, arg category) error {
 		return err
 	}
 
+	var op *m.Operand
 	switch arg {
 	case OPONE:
-		p.currentOperation.OpOne.SR = SR
+		op = &p.currentOperation.OpOne
 	case OPTWO:
-		p.currentOperation.OpTwo.SR = SR
+		op = &p.currentOperation.OpTwo
 	case OPTHREE:
-		p.currentOperation.OpThree.SR = SR
+		op = &p.currentOperation.OpThree
 	}
+
+	op.Active = true
+
+	op.SR = SR
+	op.VR = -1
+	op.NU = -1
 
 	return nil
 }

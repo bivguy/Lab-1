@@ -17,7 +17,14 @@ func (t Token) String() string {
 }
 
 type Operand struct {
-	SR int
+	SR     int
+	VR     int
+	NU     int
+	Active bool
+}
+
+func (op Operand) String() string {
+	return fmt.Sprintf("[SR=%d, VR=%d, NU=%d, Active=%t]", op.SR, op.VR, op.NU, op.Active)
 }
 
 type OperationNode struct {

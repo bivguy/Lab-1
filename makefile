@@ -46,9 +46,13 @@ default-parse:
 wrong-parse:
 	./412fe -r test_files/Holmes.txt
 
-
 tar: clean
 	@tar $(TAR_EXCLUDES) -cvf $(TARFILE) .
+
+# commands for lab 2
+
+default-rename:
+	./412fe -x test_files/rename.txt
 
 
 

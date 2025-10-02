@@ -57,7 +57,8 @@ func (p *parser) Parse() (*list.List, error) {
 			fmt.Fprintln(os.Stderr, wrappedErr)
 			p.ErrorFound = true
 		} else {
-			p.operations.PushBack(p.currentOperation)
+			op := p.currentOperation
+			p.operations.PushBack(op)
 		}
 
 		p.currentOperation = m.OperationNode{}

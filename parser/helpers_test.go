@@ -19,6 +19,15 @@ type PerformanceTestCase struct {
 	MaximumTimeMs int64
 }
 
+func createOperand(SR int) m.Operand {
+	return m.Operand{
+		SR:     SR,
+		Active: true,
+		VR:     -1,
+		NU:     -1,
+	}
+}
+
 var simpleTestCases = []TestCase{
 	{
 		description: "simple MEMOP test",
@@ -29,8 +38,8 @@ var simpleTestCases = []TestCase{
 			ir.PushBack(m.OperationNode{
 				Line:    1,
 				Opcode:  "store",
-				OpOne:   m.Operand{SR: 1},
-				OpThree: m.Operand{SR: 2},
+				OpOne:   createOperand(1),
+				OpThree: createOperand(2),
 			})
 
 			return ir
@@ -45,8 +54,8 @@ var simpleTestCases = []TestCase{
 			ir.PushBack(m.OperationNode{
 				Line:    1,
 				Opcode:  "loadI",
-				OpOne:   m.Operand{SR: 17},
-				OpThree: m.Operand{SR: 1},
+				OpOne:   createOperand(17),
+				OpThree: createOperand(1),
 			})
 
 			return ir
@@ -61,9 +70,9 @@ var simpleTestCases = []TestCase{
 			ir.PushBack(m.OperationNode{
 				Line:    1,
 				Opcode:  "add",
-				OpOne:   m.Operand{SR: 1},
-				OpTwo:   m.Operand{SR: 1},
-				OpThree: m.Operand{SR: 2},
+				OpOne:   createOperand(1),
+				OpTwo:   createOperand(1),
+				OpThree: createOperand(2),
 			})
 
 			return ir
@@ -78,7 +87,7 @@ var simpleTestCases = []TestCase{
 			ir.PushBack(m.OperationNode{
 				Line:    1,
 				Opcode:  "output",
-				OpThree: m.Operand{SR: 2214},
+				OpThree: createOperand(2214),
 			})
 
 			return ir
@@ -107,7 +116,7 @@ var simpleTestCases = []TestCase{
 			ir.PushBack(m.OperationNode{
 				Line:    3,
 				Opcode:  "output",
-				OpThree: m.Operand{SR: 4},
+				OpThree: createOperand(4),
 			})
 
 			return ir

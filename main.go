@@ -9,6 +9,7 @@ import (
 	c "github.com/bivguy/Comp412/constants"
 	m "github.com/bivguy/Comp412/models"
 	"github.com/bivguy/Comp412/parser"
+	"github.com/bivguy/Comp412/renamer"
 
 	"github.com/bivguy/Comp412/scanner"
 )
@@ -18,6 +19,8 @@ func main() {
 	sFlag := flag.Bool("s", false, "Display the Scanner Output")
 	pFlag := flag.Bool("p", false, "Display the Parser Output")
 	rFlag := flag.Bool("r", false, "Display the Intermediate Representation Output")
+
+	xFlag := flag.Bool("x", false, "Displays the Renamed Intermediate Representation Output")
 
 	flag.Parse()
 
@@ -56,7 +59,7 @@ func main() {
 	scanner := scanner.New(file)
 	parser := parser.New(scanner)
 
-	if *sFlag || *pFlag || *rFlag {
+	if *sFlag || *pFlag || *rFlag || *xFlag {
 		if *rFlag {
 			IR, err := parser.Parse()
 			// we only print the IR there is no error found
@@ -83,6 +86,18 @@ func main() {
 					break
 				}
 			}
+		} else if *xFlag {
+			IR, err := parser.Parse()
+			if parser.ErrorFound || err != nil {
+				fmt.Println("Parse found errors")
+				return
+			}
+
+			renamer := renamer.New(6, IR)
+
+			renamedIR := renamer.Rename()
+			fmt.Println("about to print")
+			fmt.Println(PrettyPrintIR(renamedIR))
 		}
 	} else {
 		// default behavior is of pflag
@@ -117,7 +132,7 @@ func PrettyPrintIR(ir *list.List) string {
 	result := ""
 	for e := ir.Front(); e != nil; e = e.Next() {
 		op := e.Value.(m.OperationNode)
-		result += fmt.Sprintf("%s\n", op)
+		result += fmt.Sprintf("%s\n\n", op)
 	}
 	return result
 }
