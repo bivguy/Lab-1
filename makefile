@@ -19,7 +19,10 @@ TAR_EXCLUDES := \
   --exclude='*.log' \
   --exclude='.git' \
   --exclude='.vscode' \
-  --exclude='$(BIN)'
+  --exclude='$(BIN)' \
+  --exclude='test_files/correct' \
+  --exclude='bs81.log' \
+  --exclude='CodeCheck2' \
 
 # ---- targets ----
 .PHONY: all build clean run test
@@ -49,7 +52,7 @@ wrong-parse:
 tar: clean
 	@tar $(TAR_EXCLUDES) -cvf $(TARFILE) .
 
-# commands for lab 2
+# commands for lab 2 
 
 default-rename: clean-build
 	./$(BIN) -x test_files/rename.txt
@@ -68,4 +71,32 @@ ccFour: clean-build
 
 ccFive: clean-build
 	./$(BIN) -x test_files/cci.i
+
+# checkin 2
+
+default-alloc: clean-build
+	./$(BIN) 5 test_files/rename.txt
+
+cc2One: clean-build
+	./$(BIN) 5 test_files/cc1.txt
+
+cc2One2: clean-build
+	./$(BIN) 7 test_files/cc1.txt
+
+cc2Two: clean-build
+	./$(BIN) 5 test_files/cc2.i
+
+cc2Two2: clean-build
+	./$(BIN) 7 test_files/cc2.i
+
+cc2Three: clean-build
+	./$(BIN) 5 test_files/cc3.i
+
+cc2Four: clean-build
+	./$(BIN) 5 test_files/cc4.i
+
+cc2Five: clean-build
+	./$(BIN) 5 test_files/cc5.i
+
+
 

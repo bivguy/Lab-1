@@ -5,8 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
+	"github.com/bivguy/Comp412/allocator"
 	c "github.com/bivguy/Comp412/constants"
 	m "github.com/bivguy/Comp412/models"
 	"github.com/bivguy/Comp412/parser"
@@ -37,6 +39,14 @@ func main() {
 
 	// filename
 	args := flag.Args()
+
+	if len(args) >= 2 {
+		if k, err := strconv.Atoi(args[0]); err == nil {
+			filename := args[1]
+			runAllocatorMode(k, filename)
+			return
+		}
+	}
 	if len(args) == 0 {
 		fmt.Fprintln(os.Stderr, "ERROR: missing <filename>")
 		helpMessage()
@@ -148,7 +158,6 @@ func renameIR(ir *list.List) string {
 		case *m.OperationNode:
 			op = v
 		case m.OperationNode:
-			// safe: we only read fields to format
 			tmp := v
 			op = &tmp
 		default:
@@ -192,4 +201,97 @@ func renameIR(ir *list.List) string {
 	}
 
 	return b.String()
+}
+
+func allocIR(ir *list.List) string {
+	var b strings.Builder
+
+	for e := ir.Front(); e != nil; e = e.Next() {
+		var op *m.OperationNode
+		switch v := e.Value.(type) {
+		case *m.OperationNode:
+			op = v
+		case m.OperationNode:
+			tmp := v
+			op = &tmp
+		default:
+			continue
+		}
+
+		switch op.Opcode {
+		// ARITH (two uses, one def)
+		case "add", "mult", "sub", "lshift", "rshift": // add rA,rB => rC
+			fmt.Fprintf(&b, "%s r%d,r%d => r%d\n",
+				op.Opcode, op.OpOne.PR, op.OpTwo.PR, op.OpThree.PR)
+
+		// LOAD variants
+		case "load": // load rAddr => rDst
+			fmt.Fprintf(&b, "load r%d => r%d\n",
+				op.OpOne.PR, op.OpThree.PR)
+
+		case "loadI":
+			fmt.Fprintf(&b, "loadI %d => r%d\n",
+				op.OpOne.SR, op.OpThree.PR)
+
+		// STORE (two uses, no def)
+		case "store": // store rVal => rAddr
+			fmt.Fprintf(&b, "store r%d => r%d\n",
+				op.OpOne.PR, op.OpThree.PR)
+
+		// OUTPUT
+		case "output": // output => rX
+			fmt.Fprintf(&b, "output => %d\n", op.OpThree.SR)
+
+		// NOP
+		case "nop":
+			fmt.Fprintf(&b, "nop\n")
+
+		default:
+			fmt.Fprintf(&b, "%s ???\n", op.Opcode)
+		}
+	}
+
+	return b.String()
+}
+
+func runAllocatorMode(k int, filename string) {
+	// Validate k and file
+	if k < 3 || k > 64 {
+		fmt.Fprintf(os.Stderr, "ERROR: k must be in [3, 64], got %d\n", k)
+		os.Exit(1)
+	}
+	f, err := os.Open(filename)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: cannot open file '%s': %v\n", filename, err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
+	// scan and parse
+	sc := scanner.New(f)
+	ps := parser.New(sc)
+	IR, err := ps.Parse()
+	if ps.ErrorFound || err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: parse failed for '%s'\n", filename)
+		os.Exit(1)
+	}
+
+	// Rename
+	largestRegister := ps.GetLargestRegister()
+	renamer := renamer.New(largestRegister, IR)
+	IR = renamer.Rename()
+
+	alloc := allocator.New(renamer.SRToVR, renamer.LU, IR, renamer.MaxVR, k)
+	IR = alloc.Allocate()
+
+	PRToVR := alloc.PRToVR
+	VRToPR := alloc.VRToPR
+
+	for i := 0; i < len(PRToVR); i++ {
+		if PRToVR[i] != -1 && i != VRToPR[PRToVR[i]] {
+			fmt.Print("INVALID MAPPING\n")
+		}
+	}
+
+	fmt.Println(allocIR(IR))
 }

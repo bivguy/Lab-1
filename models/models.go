@@ -19,6 +19,7 @@ func (t Token) String() string {
 type Operand struct {
 	SR     int
 	VR     int
+	PR     int
 	NU     float64
 	Active bool
 }

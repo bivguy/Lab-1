@@ -9,10 +9,13 @@ import (
 
 type renamer struct {
 	SRToVR []int
-	LU     []float64 // SWITCH TO SLICES AT SOME POINT
-	maxSR  int
-	index  int
-	IR     *list.List
+	LU     []float64
+
+	MaxSR int
+	MaxVR int
+	index int
+
+	IR *list.List
 }
 
 func New(maxSR int, IR *list.List) *renamer {
@@ -27,7 +30,8 @@ func New(maxSR int, IR *list.List) *renamer {
 	return &renamer{
 		SRToVR: SRToVR,
 		LU:     LU,
-		maxSR:  maxSR,
+		MaxSR:  maxSR,
+		MaxVR:  0,
 		index:  IR.Len(),
 		IR:     IR,
 	}
@@ -36,6 +40,7 @@ func New(maxSR int, IR *list.List) *renamer {
 func (r *renamer) Rename() *list.List {
 	vrName := 0
 	// var liveMap map[]
+	// curLive, maxLive := 0, 0
 	// go through the IR in reverse order
 	for node := r.IR.Back(); node != nil; node = node.Prev() {
 		op := node.Value.(*m.OperationNode)
@@ -57,6 +62,7 @@ func (r *renamer) Rename() *list.List {
 			if r.SRToVR[o.SR] == -1 {
 				r.SRToVR[o.SR] = vrName
 				vrName++
+				// curLive += 1
 			}
 
 			o.VR = r.SRToVR[o.SR]
@@ -90,6 +96,10 @@ func (r *renamer) Rename() *list.List {
 			}
 
 			r.LU[o.SR] = float64(r.index)
+		}
+
+		if r.MaxVR < vrName {
+			r.MaxVR = vrName
 		}
 
 		r.index--
