@@ -8,6 +8,7 @@ import (
 )
 
 const RESERVEDREGISTER = 32768
+const INVALIDREGISTER = 32767
 
 type allocator struct {
 	SRToVR []int
@@ -19,6 +20,8 @@ type allocator struct {
 	PRNU         []float64 // a map from a physical register to the operation that next uses the value that is currently in that physical register
 	marks        []bool
 	freePRStack  []int
+
+	deletePreviousNode bool
 
 	curOperationNode *list.Element
 
@@ -41,6 +44,8 @@ func New(SRToVR []int, LU []float64, IR *list.List, maxVR int, maxPR int) *alloc
 	if maxPR < getMaxLive(IR, maxVR) {
 		maxPR -= 1
 	}
+
+	print("maxPR: ", maxPR, "\n")
 
 	PRToVR := make([]int, maxPR)
 	PRNU := make([]float64, maxPR)
@@ -68,6 +73,8 @@ func New(SRToVR []int, LU []float64, IR *list.List, maxVR int, maxPR int) *alloc
 		marks:        marks,
 		freePRStack:  freePRStack,
 
+		deletePreviousNode: false,
+
 		maxPR:      maxPR,
 		maxVR:      maxVR,
 		memAddress: RESERVEDREGISTER,
@@ -81,6 +88,7 @@ func New(SRToVR []int, LU []float64, IR *list.List, maxVR int, maxPR int) *alloc
 func (a *allocator) Allocate() *list.List {
 	// iterate over the block
 	for node := a.IR.Front(); node != nil; node = node.Next() {
+		a.deletePrevNode()
 
 		op := node.Value.(*m.OperationNode)
 		a.curOperationNode = node

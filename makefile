@@ -98,5 +98,10 @@ cc2Four: clean-build
 cc2Five: clean-build
 	./$(BIN) 5 test_files/cc5.i
 
+# autograder
+
+
+ag2: clean-build
+	./$(BIN) 3 test_files/report2.i
 
 
