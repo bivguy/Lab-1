@@ -8,12 +8,15 @@ import (
 )
 
 type renamer struct {
-	SRToVR []int
-	LU     []float64
+	SRToVR       []int
+	LU           []float64
+	VRToConstant map[int]int // a map from a virtual register to its rematerialization location
 
 	MaxSR int
 	MaxVR int
 	index int
+
+	deletePrevNode bool
 
 	IR *list.List
 }
@@ -21,6 +24,7 @@ type renamer struct {
 func New(maxSR int, IR *list.List) *renamer {
 	SRToVR := make([]int, maxSR+1)
 	LU := make([]float64, maxSR+1)
+	VRToConstant := map[int]int{}
 
 	for i := 0; i <= maxSR; i++ {
 		SRToVR[i] = -1
@@ -28,12 +32,14 @@ func New(maxSR int, IR *list.List) *renamer {
 	}
 
 	return &renamer{
-		SRToVR: SRToVR,
-		LU:     LU,
-		MaxSR:  maxSR,
-		MaxVR:  0,
-		index:  IR.Len(),
-		IR:     IR,
+		SRToVR:       SRToVR,
+		LU:           LU,
+		VRToConstant: VRToConstant,
+
+		MaxSR: maxSR,
+		MaxVR: 0,
+		index: IR.Len(),
+		IR:    IR,
 	}
 }
 
@@ -45,8 +51,36 @@ func (r *renamer) Rename() *list.List {
 	for node := r.IR.Back(); node != nil; node = node.Prev() {
 		op := node.Value.(*m.OperationNode)
 
+		if r.deletePrevNode {
+			r.IR.Remove(node.Next())
+			r.deletePrevNode = false
+		}
+
 		if op.Opcode == "nop" || op.Opcode == "output" {
 			r.index--
+			continue
+		}
+
+		// same logic as definition (loadI)
+
+		if op.Opcode == "loadI" {
+			o1 := &op.OpOne
+			o3 := &op.OpThree
+
+			if r.SRToVR[o3.SR] == -1 {
+				r.SRToVR[o3.SR] = vrName
+				vrName++
+			}
+			o3.VR = r.SRToVR[o3.SR]
+			o3.NU = r.LU[o3.SR]
+
+			r.VRToConstant[o3.VR] = o1.SR
+
+			r.SRToVR[o3.SR] = -1
+			r.LU[o3.SR] = math.Inf(1)
+
+			// mark this node for deletion
+			r.deletePrevNode = true
 			continue
 		}
 
@@ -105,6 +139,14 @@ func (r *renamer) Rename() *list.List {
 		r.index--
 	}
 
+	node := r.IR.Front()
+	op := node.Value.(*m.OperationNode)
+
+	if op.Opcode == "loadI" {
+		r.IR.Remove(node)
+	}
+
+	// fmt.Printf("VR to Constant", r.VRToConstant, "\n")
 	return r.IR
 }
 

@@ -280,8 +280,14 @@ func runAllocatorMode(k int, filename string) {
 	largestRegister := ps.GetLargestRegister()
 	renamer := renamer.New(largestRegister, IR)
 	IR = renamer.Rename()
+	// fmt.Printf("Renamer map after remaing: ", renamer.VRToConstant, "\n")
+	vrConstCopy := map[int]int{}
+	for k, v := range renamer.VRToConstant {
+		vrConstCopy[k] = v
+	}
+	// fmt.Printf("Renamer map after remaing: ", renamer.VRToConstant, "\n")
 
-	alloc := allocator.New(renamer.SRToVR, renamer.LU, IR, renamer.MaxVR, k)
+	alloc := allocator.New(renamer.SRToVR, renamer.LU, IR, renamer.MaxVR, k, vrConstCopy)
 	IR = alloc.Allocate()
 
 	PRToVR := alloc.PRToVR

@@ -100,6 +100,12 @@ cc2Five: clean-build
 
 # autograder
 
+r2: clean-build
+	./$(BIN) 4 test_files/report2.txt
+
+r2rename: clean-build
+	./$(BIN) -x test_files/report2.txt
+
 
 ag2: clean-build
 	./$(BIN) 3 test_files/report2.i

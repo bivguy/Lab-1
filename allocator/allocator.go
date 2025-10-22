@@ -14,12 +14,14 @@ type allocator struct {
 	SRToVR []int
 	LU     []float64
 
-	VRToSpillLoc []int // a map from a virtual register to its spill location in memory
-	VRToPR       []int
-	PRToVR       []int
-	PRNU         []float64 // a map from a physical register to the operation that next uses the value that is currently in that physical register
-	marks        []bool
-	freePRStack  []int
+	VRToSpillLoc []int       // a map from a virtual register to its spill location in memory
+	VRToConstant map[int]int // a map from a virtual register to its rematerialization location
+
+	VRToPR      []int
+	PRToVR      []int
+	PRNU        []float64 // a map from a physical register to the operation that next uses the value that is currently in that physical register
+	marks       []bool
+	freePRStack []int
 
 	deletePreviousNode bool
 
@@ -32,20 +34,21 @@ type allocator struct {
 	IR *list.List
 }
 
-func New(SRToVR []int, LU []float64, IR *list.List, maxVR int, maxPR int) *allocator {
+func New(SRToVR []int, LU []float64, IR *list.List, maxVR int, maxPR int, VRToConstant map[int]int) *allocator {
 	VRToPR := make([]int, maxVR)
 	VRToSpillLoc := make([]int, maxVR)
 
 	//  vr := 0; vr <= maxVR; vr++ {
 	for vr := range maxVR {
 		VRToPR[vr] = -1
+		VRToSpillLoc[vr] = INVALIDREGISTER
 	}
 
 	if maxPR < getMaxLive(IR, maxVR) {
 		maxPR -= 1
 	}
 
-	print("maxPR: ", maxPR, "\n")
+	// print("maxPR: ", maxPR, "\n")
 
 	PRToVR := make([]int, maxPR)
 	PRNU := make([]float64, maxPR)
@@ -67,6 +70,7 @@ func New(SRToVR []int, LU []float64, IR *list.List, maxVR int, maxPR int) *alloc
 		LU:     LU,
 
 		VRToSpillLoc: VRToSpillLoc,
+		VRToConstant: VRToConstant,
 		VRToPR:       VRToPR,
 		PRToVR:       PRToVR,
 		PRNU:         PRNU,
@@ -86,6 +90,8 @@ func New(SRToVR []int, LU []float64, IR *list.List, maxVR int, maxPR int) *alloc
 }
 
 func (a *allocator) Allocate() *list.List {
+	// fmt.Printf("Allocators VR to Constant", a.VRToConstant, "\n")
+
 	// iterate over the block
 	for node := a.IR.Front(); node != nil; node = node.Next() {
 		a.deletePrevNode()
@@ -120,11 +126,17 @@ func (a *allocator) Allocate() *list.List {
 			}
 
 			pr := a.VRToPR[u.VR]
+			// print("This is the PR: ", pr, "\n")
 
 			if pr == -1 {
 				u.PR = a.getAPR(u.VR, u.NU)
-				// restore
-				a.restore(u.VR, u.PR)
+				_, ok := a.VRToConstant[u.VR]
+				// print("This is the ok from rem: ", ok, "\n")
+				// restore: only restore if its in the spill address or in the constants
+				if a.VRToSpillLoc[u.VR] != INVALIDREGISTER || ok {
+					a.restore(u.VR, u.PR)
+				}
+
 			} else {
 				u.PR = pr
 			}
@@ -162,6 +174,21 @@ func (a *allocator) Allocate() *list.List {
 			a.marks[d.PR] = true
 			// a.PRNU[d.PR] = d.NU??
 		}
+
+		// check last def ??
+		// for i, u := range operandList {
+		// 	// skip if it's a definition since its not a use
+		// 	// TODO: may have to add in more checks (only ones with valid registers)
+		// 	if !isDefinition(op.Opcode, i) || !u.Active || !isRegister(op.Opcode, i) {
+		// 		continue
+		// 	}
+
+		// 	if u.NU == math.Inf(1) && a.PRToVR[u.PR] != -1 {
+		// 		a.freeAPR(u.PR)
+
+		// 		a.marks[u.PR] = false
+		// 	}
+		// }
 	}
 
 	return a.IR
