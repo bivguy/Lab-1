@@ -1,0 +1,116 @@
+loadI  1 => r0                // rematerialize vr22 => pr0
+loadI  2 => r1                // rematerialize vr34 => pr1
+add    r0, r1  => r0          // vr22, vr34 => vr20
+loadI  1 => r2                // rematerialize vr24 => pr2
+add    r2, r1  => r1          // vr24, vr34 => vr33
+loadI  65536 => r2            // spill pr0 (vr20) => Mem[65536]
+store  r0 => r2 
+add    r0, r1  => r0          // vr20, vr33 => vr18
+loadI  1 => r2                // rematerialize vr24 => pr2
+add    r2, r1  => r1          // vr24, vr33 => vr32
+loadI  65540 => r2            // spill pr0 (vr18) => Mem[65540]
+store  r0 => r2 
+add    r0, r1  => r0          // vr18, vr32 => vr16
+loadI  1 => r2                // rematerialize vr24 => pr2
+add    r2, r1  => r1          // vr24, vr32 => vr31
+loadI  65544 => r2            // spill pr0 (vr16) => Mem[65544]
+store  r0 => r2 
+add    r0, r1  => r0          // vr16, vr31 => vr14
+loadI  1 => r2                // rematerialize vr24 => pr2
+add    r2, r1  => r1          // vr24, vr31 => vr30
+loadI  65548 => r2            // spill pr0 (vr14) => Mem[65548]
+store  r0 => r2 
+add    r0, r1  => r0          // vr14, vr30 => vr12
+loadI  1 => r2                // rematerialize vr24 => pr2
+add    r2, r1  => r1          // vr24, vr30 => vr29
+loadI  65552 => r2            // spill pr0 (vr12) => Mem[65552]
+store  r0 => r2 
+add    r0, r1  => r0          // vr12, vr29 => vr10
+loadI  1 => r2                // rematerialize vr24 => pr2
+add    r2, r1  => r1          // vr24, vr29 => vr28
+loadI  65556 => r2            // spill pr0 (vr10) => Mem[65556]
+store  r0 => r2 
+add    r0, r1  => r0          // vr10, vr28 => vr8
+loadI  1 => r2                // rematerialize vr24 => pr2
+add    r2, r1  => r1          // vr24, vr28 => vr27
+loadI  65560 => r2            // spill pr0 (vr8) => Mem[65560]
+store  r0 => r2 
+add    r0, r1  => r0          // vr8, vr27 => vr6
+loadI  1 => r2                // rematerialize vr24 => pr2
+add    r2, r1  => r1          // vr24, vr27 => vr26
+loadI  65564 => r2            // spill pr0 (vr6) => Mem[65564]
+store  r0 => r2 
+add    r0, r1  => r0          // vr6, vr26 => vr4
+loadI  1 => r2                // rematerialize vr24 => pr2
+add    r2, r1  => r1          // vr24, vr26 => vr25
+loadI  65568 => r2            // spill pr0 (vr4) => Mem[65568]
+store  r0 => r2 
+add    r0, r1  => r0          // vr4, vr25 => vr1
+loadI  1 => r2                // rematerialize vr24 => pr2
+add    r2, r1  => r1          // vr24, vr25 => vr23
+loadI  1 => r1                // rematerialize vr22 => pr1
+loadI  2048 => r2             // rematerialize vr21 => pr2
+store  r1 => r2               // vr22 => Mem[vr21]
+loadI  2048 => r1             // rematerialize vr21 => pr1
+loadI  4 => r2                // rematerialize vr3 => pr2
+add    r1, r2  => r1          // vr21, vr3 => vr19
+loadI  65572 => r2            // spill pr0 (vr1) => Mem[65572]
+store  r0 => r2 
+loadI  65536 => r0            // restore  Mem[65536] (vr20) => pr 0
+load   r0 => r0 
+store  r0 => r1               // vr20 => Mem[vr19]
+loadI  4 => r0                // rematerialize vr3 => pr0
+add    r1, r0  => r1          // vr19, vr3 => vr17
+loadI  65540 => r0            // restore  Mem[65540] (vr18) => pr 0
+load   r0 => r0 
+store  r0 => r1               // vr18 => Mem[vr17]
+loadI  4 => r0                // rematerialize vr3 => pr0
+add    r1, r0  => r1          // vr17, vr3 => vr15
+loadI  65544 => r0            // restore  Mem[65544] (vr16) => pr 0
+load   r0 => r0 
+store  r0 => r1               // vr16 => Mem[vr15]
+loadI  4 => r0                // rematerialize vr3 => pr0
+add    r1, r0  => r1          // vr15, vr3 => vr13
+loadI  65548 => r0            // restore  Mem[65548] (vr14) => pr 0
+load   r0 => r0 
+store  r0 => r1               // vr14 => Mem[vr13]
+loadI  4 => r0                // rematerialize vr3 => pr0
+add    r1, r0  => r1          // vr13, vr3 => vr11
+loadI  65552 => r0            // restore  Mem[65552] (vr12) => pr 0
+load   r0 => r0 
+store  r0 => r1               // vr12 => Mem[vr11]
+loadI  4 => r0                // rematerialize vr3 => pr0
+add    r1, r0  => r1          // vr11, vr3 => vr9
+loadI  65556 => r0            // restore  Mem[65556] (vr10) => pr 0
+load   r0 => r0 
+store  r0 => r1               // vr10 => Mem[vr9]
+loadI  4 => r0                // rematerialize vr3 => pr0
+add    r1, r0  => r1          // vr9, vr3 => vr7
+loadI  65560 => r0            // restore  Mem[65560] (vr8) => pr 0
+load   r0 => r0 
+store  r0 => r1               // vr8 => Mem[vr7]
+loadI  4 => r0                // rematerialize vr3 => pr0
+add    r1, r0  => r1          // vr7, vr3 => vr5
+loadI  65564 => r0            // restore  Mem[65564] (vr6) => pr 0
+load   r0 => r0 
+store  r0 => r1               // vr6 => Mem[vr5]
+loadI  4 => r0                // rematerialize vr3 => pr0
+add    r1, r0  => r1          // vr5, vr3 => vr2
+loadI  65568 => r0            // restore  Mem[65568] (vr4) => pr 0
+load   r0 => r0 
+store  r0 => r1               // vr4 => Mem[vr2]
+loadI  4 => r0                // rematerialize vr3 => pr0
+add    r1, r0  => r0          // vr2, vr3 => vr0
+loadI  65572 => r1            // restore  Mem[65572] (vr1) => pr 1
+load   r1 => r1 
+store  r1 => r0               // vr1 => Mem[vr0]
+output 2048                   // as in the input
+output 2052                   // as in the input
+output 2056                   // as in the input
+output 2060                   // as in the input
+output 2064                   // as in the input
+output 2068                   // as in the input
+output 2072                   // as in the input
+output 2076                   // as in the input
+output 2080                   // as in the input
+output 2084                   // as in the input

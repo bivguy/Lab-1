@@ -129,10 +129,14 @@ func helpMessage() {
 	fmt.Println("412fe is the front end for the compiler project.")
 	fmt.Println()
 	fmt.Println("Flags:")
+
 	fmt.Println("  -h \t\t Display this help message.")
 	fmt.Println("  -s <filename>\t Read the specified file, scan it, and print a list of tokens.")
 	fmt.Println("  -p <filename>\t Read the specified file, scan it, parse it, and report success or failure.")
 	fmt.Println("  -r <filename>\t Read the specified file, scan it, parse it, and print the intermediate representation.")
+	fmt.Println("  -x <filename>\t scans and parse the input block. It should then perform renaming the code in the input block and print the results to the standard output stream.")
+	fmt.Println("  <int k> <filename>\t  scans and parse the input block. It should then perform renaming, then allocating with the inputted integer representing the number of reserved registers. It then prints the results of the register allocation to the standard output stream.")
+
 	fmt.Println("No flag provided: behaves as if -p <filename> was specified.")
 }
 

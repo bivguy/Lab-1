@@ -13,6 +13,8 @@ func (a *allocator) getAPR(VR int, NU float64) int {
 	if l > 0 {
 		pr = a.popStack()
 	} else {
+		// op := a.curOperationNode.Value.(*m.OperationNode)
+		// fmt.Println("About to spill for VR", VR)
 		furthestNextUse := -1
 
 		for i := 0; i < a.maxPR; i++ {

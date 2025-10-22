@@ -2,7 +2,6 @@ package allocator
 
 import (
 	"container/list"
-	"fmt"
 	"math"
 
 	m "github.com/bivguy/Comp412/models"
@@ -100,14 +99,6 @@ func (a *allocator) Allocate() *list.List {
 			continue
 		}
 
-		// for i := 0; i < len(a.PRToVR); i++ {
-		// 	if a.PRToVR[i] != -1 && i != a.VRToPR[a.PRToVR[i]] {
-		// 		fmt.Println("INVALID MAPPING: ", a.PRToVR, a.VRToPR)
-		// 		fmt.Println(op)
-		// 		fmt.Println("")
-		// 	}
-		// }
-
 		// clear the mark in each PR
 		for i := range a.marks {
 			a.marks[i] = false
@@ -123,11 +114,11 @@ func (a *allocator) Allocate() *list.List {
 			}
 
 			pr := a.VRToPR[u.VR]
-
-			fmt.Println("")
+			// fmt.Println("at op ", op)
 
 			if pr == -1 {
 				u.PR = a.getAPR(u.VR, u.NU)
+				// fmt.Println("Does not exist for operand ", u, ". Now, it is ", u.PR)
 				_, ok := a.VRToConstant[u.VR]
 				// restore: only restore if its in the spill address or in the constants
 				if a.VRToSpillLoc[u.VR] != INVALIDREGISTER || ok {
@@ -135,10 +126,17 @@ func (a *allocator) Allocate() *list.List {
 				}
 
 			} else {
+				// fmt.Println(" exist for operand ", u, ", as ", u.PR)
 				u.PR = pr
 			}
 			// set the mark in u.PR
 			a.marks[u.PR] = true
+
+			// *** early-free LAST USE right away ***
+			// if u.NU == math.Inf(1) && a.PRToVR[u.PR] != -1 {
+			// 	a.freeAPR(u.PR)
+			// 	a.marks[u.PR] = false
+			// }
 		}
 
 		// go through each use, checking for last use
@@ -150,6 +148,7 @@ func (a *allocator) Allocate() *list.List {
 			}
 
 			if u.NU == math.Inf(1) && a.PRToVR[u.PR] != -1 {
+				// fmt.Println("freeing the PR: ", u.PR)
 				a.freeAPR(u.PR)
 			}
 		}
@@ -167,25 +166,13 @@ func (a *allocator) Allocate() *list.List {
 			}
 
 			d.PR = a.getAPR(d.VR, d.NU)
+			// fmt.Println("Got the definition pr: ", d.PR, " at def ", d)
 			// set the mark in D.PR
 			a.marks[d.PR] = true
 			// a.PRNU[d.PR] = d.NU??
 		}
-
-		// check last def ??
-		// for i, u := range operandList {
-		// 	// skip if it's a definition since its not a use
-		// 	// TODO: may have to add in more checks (only ones with valid registers)
-		// 	if !isDefinition(op.Opcode, i) || !u.Active || !isRegister(op.Opcode, i) {
-		// 		continue
-		// 	}
-
-		// 	if u.NU == math.Inf(1) && a.PRToVR[u.PR] != -1 {
-		// 		a.freeAPR(u.PR)
-
-		// 		a.marks[u.PR] = false
-		// 	}
-		// }
+		// fmt.Println()
+		// fmt.Println()
 	}
 
 	return a.IR

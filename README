@@ -35,6 +35,10 @@ Flags (Should be mutually exclusive; priority: -h > -r > -p > -s):
       
       If parsing fails, error messages are written to stderr and the IR is not printed.
 
+    -x <filename>
+        scans and parse the input block. It should then perform renaming the code in the input block and print the results to the standard output stream.
+    -<integer k> <filename>
+        scans and parse the input block. It should then perform renaming the code in the input block and print the results to the standard output stream.
 Default behavior:
     If no flag is specified, the program behaves as if -p <filename> was provided.
 

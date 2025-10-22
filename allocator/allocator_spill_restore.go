@@ -6,6 +6,8 @@ import (
 
 // evicts a value from a register and stores its value
 func (a *allocator) spill(pr int) {
+	// op := a.curOperationNode.Value.(*m.OperationNode)
+	// fmt.Println("About to spill for ", op)
 	loadIInstruction := &m.OperationNode{
 		Opcode: "loadI",
 		OpOne:  m.Operand{Active: true, SR: a.memAddress},
