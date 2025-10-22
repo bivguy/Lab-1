@@ -2,6 +2,7 @@ package allocator
 
 import (
 	"container/list"
+	"fmt"
 	"math"
 
 	m "github.com/bivguy/Comp412/models"
@@ -48,8 +49,6 @@ func New(SRToVR []int, LU []float64, IR *list.List, maxVR int, maxPR int, VRToCo
 		maxPR -= 1
 	}
 
-	// print("maxPR: ", maxPR, "\n")
-
 	PRToVR := make([]int, maxPR)
 	PRNU := make([]float64, maxPR)
 	freePRStack := []int{}
@@ -90,8 +89,6 @@ func New(SRToVR []int, LU []float64, IR *list.List, maxVR int, maxPR int, VRToCo
 }
 
 func (a *allocator) Allocate() *list.List {
-	// fmt.Printf("Allocators VR to Constant", a.VRToConstant, "\n")
-
 	// iterate over the block
 	for node := a.IR.Front(); node != nil; node = node.Next() {
 		a.deletePrevNode()
@@ -126,12 +123,12 @@ func (a *allocator) Allocate() *list.List {
 			}
 
 			pr := a.VRToPR[u.VR]
-			// print("This is the PR: ", pr, "\n")
+
+			fmt.Println("")
 
 			if pr == -1 {
 				u.PR = a.getAPR(u.VR, u.NU)
 				_, ok := a.VRToConstant[u.VR]
-				// print("This is the ok from rem: ", ok, "\n")
 				// restore: only restore if its in the spill address or in the constants
 				if a.VRToSpillLoc[u.VR] != INVALIDREGISTER || ok {
 					a.restore(u.VR, u.PR)

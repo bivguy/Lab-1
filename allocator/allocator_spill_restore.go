@@ -6,16 +6,6 @@ import (
 
 // evicts a value from a register and stores its value
 func (a *allocator) spill(pr int) {
-	// op := a.curOperationNode.Value.(*m.OperationNode)
-	// // check if this is a rematerializable value
-	// if op.Opcode == "loadI" {
-	// 	// print("about to rematerialize. ")
-	// 	// storing the
-	// 	a.VRToSpillLoc[op.OpThree.VR] = -op.OpOne.SR
-	// 	a.deletePreviousNode = true
-	// 	return
-	// }
-
 	loadIInstruction := &m.OperationNode{
 		Opcode: "loadI",
 		OpOne:  m.Operand{Active: true, SR: a.memAddress},
@@ -53,18 +43,6 @@ func (a *allocator) restore(vr int, pr int) {
 		a.IR.InsertBefore(loadIInstruction, a.curOperationNode)
 		return
 	}
-	// if a.VRToSpillLoc[vr] < 1 {
-	// 	loadIInstruction := &m.OperationNode{
-	// 		Opcode: "loadI",
-	// 		OpOne: m.Operand{Active: true,
-	// 			SR: -a.VRToSpillLoc[vr],
-	// 		},
-	// 		OpThree: m.Operand{Active: true, PR: pr},
-	// 	}
-
-	// 	a.IR.InsertBefore(loadIInstruction, a.curOperationNode)
-	// 	return
-	// }
 
 	// fmt.Print("about to restore ", a.curOperationNode.Value, ".\n")
 	loadIInstruction := &m.OperationNode{
@@ -89,10 +67,6 @@ func (a *allocator) deletePrevNode() {
 	if !a.deletePreviousNode {
 		return
 	}
-
-	// op := a.curOperationNode.Prev().Value.(*m.OperationNode)
-
-	// fmt.Println("About to delete previous node: ", op)
 
 	a.IR.Remove(a.curOperationNode.Prev())
 	a.deletePreviousNode = false

@@ -11,7 +11,6 @@ func (a *allocator) getAPR(VR int, NU float64) int {
 	l := len(a.freePRStack)
 	var pr int
 	if l > 0 {
-		// fmt.Print("about to pop from stack: ", a.freePRStack, ".\n")
 		pr = a.popStack()
 	} else {
 		furthestNextUse := -1
@@ -24,7 +23,6 @@ func (a *allocator) getAPR(VR int, NU float64) int {
 		}
 
 		// pick an unmarked x to spill
-		// fmt.Print("about to spill ", a.curOperationNode.Value, ".\n")
 		a.spill(pr)
 		a.VRToPR[a.PRToVR[pr]] = -1
 	}
