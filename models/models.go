@@ -49,3 +49,10 @@ func (op OperationNode) String() string {
 		op.OpThree,
 	)
 }
+
+type DependenceNode struct {
+	Op                 *OperationNode
+	Edges              map[int]*DependenceNode
+	ConflictEdges      map[int]*DependenceNode
+	SerializationEdges map[int]*DependenceNode
+}
