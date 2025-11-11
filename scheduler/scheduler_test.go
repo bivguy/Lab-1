@@ -15,6 +15,7 @@ type TestCase struct {
 type PriorityTestCase struct {
 	description string
 	graph       *DependenceGraph
+	expected    map[int]int
 }
 
 func createOperand(VR int) m.Operand {
@@ -190,7 +191,7 @@ var simplePriorityTestCases = []PriorityTestCase{
 			gph.ConnectNodes(h, g, m.DATA) // h -> g
 			gph.ConnectNodes(i, h, m.DATA) // i -> h
 
-			// connect all the SERIALIZATION edges (reversed: use → def)
+			// connect all the SERIALIZATION edges
 			gph.ConnectNodes(i, a, m.SERIALIZATION)
 			gph.ConnectNodes(i, c, m.SERIALIZATION)
 			gph.ConnectNodes(i, e, m.SERIALIZATION)
@@ -198,6 +199,17 @@ var simplePriorityTestCases = []PriorityTestCase{
 
 			return gph
 		}(),
+		expected: map[int]int{
+			1: 22,
+			2: 16,
+			3: 21,
+			4: 15,
+			5: 18,
+			6: 12,
+			7: 15,
+			8: 9,
+			9: 6,
+		},
 	},
 }
 
@@ -240,6 +252,15 @@ func runPriorityTest(tc PriorityTestCase, t *testing.T) {
 	// print out each node's latency and line number// Print all nodes and their computed TotalLatency
 	for line, n := range tc.graph.DGraph {
 		t.Logf("Line %2d | Opcode %-6s | TotalLatency = %d", line, n.Op.Opcode, n.TotalLatency)
+	}
+
+	for l, expectedLatency := range tc.expected {
+		actualLatency := tc.graph.DGraph[l].TotalLatency
+
+		if expectedLatency != actualLatency {
+			t.Errorf("Mismatch: On line %d, expected latency of %d but got %d", l, expectedLatency, actualLatency)
+		}
+
 	}
 
 }
