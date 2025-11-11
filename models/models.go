@@ -51,8 +51,37 @@ func (op OperationNode) String() string {
 }
 
 type DependenceNode struct {
-	Op                 *OperationNode
-	Edges              map[int]*DependenceNode
-	ConflictEdges      map[int]*DependenceNode
-	SerializationEdges map[int]*DependenceNode
+	Op           *OperationNode
+	Edges        map[int]*DependenceEdge
+	TotalLatency int
+	// ConflictEdges      map[int]*DependenceNode
+	// SerializationEdges map[int]*DependenceNode
+}
+
+type EdgeType int
+
+const (
+	DATA          EdgeType = iota // 0
+	CONFLICT                      // 1
+	SERIALIZATION                 // 2
+)
+
+func (e EdgeType) String() string {
+	switch e {
+	case DATA:
+		return "DATA"
+	case CONFLICT:
+		return "CONFLICT"
+	case SERIALIZATION:
+		return "SERIALIZATION"
+	default:
+		return fmt.Sprintf("EdgeType(%d)", e)
+	}
+}
+
+type DependenceEdge struct {
+	// From    *DependenceNode
+	To      *DependenceNode
+	Type    EdgeType
+	Latency int
 }
