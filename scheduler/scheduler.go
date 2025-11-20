@@ -22,7 +22,8 @@ func NewSchedule(IR *list.List) *scheduler {
 	return &scheduler{IR: IR}
 }
 
-func (s *scheduler) Schedule() {
+func (s *scheduler) Schedule() [][]*m.DependenceNode {
+	var schedule [][]*m.DependenceNode
 	// create a dependence graph
 	graph := New()
 	graph.CreateDependenceGraph(s.IR)
@@ -36,6 +37,18 @@ func (s *scheduler) Schedule() {
 	for _, leafNode := range graph.leafNodes {
 		heap.Push(&ready, leafNode)
 		leafNode.Status = READY
+	}
+
+	// create a NOP operation to be used
+	// we only require 1 nop Operation by reference, as it will only be printed out and not be used in other ways
+	op := &m.OperationNode{
+		Opcode: "nop",
+	}
+	notOp := &m.DependenceNode{
+		Op:           op,
+		Edges:        make(map[int]*m.DependenceEdge),
+		ReverseEdges: make(map[int]*m.DependenceEdge),
+		Status:       RETIRED,
 	}
 
 	active := make(map[int][]*m.DependenceNode)
@@ -65,13 +78,19 @@ func (s *scheduler) Schedule() {
 			retiredOp.Status = RETIRED
 		}
 
+		// if there are no retiredOps then we must add a NOP
+		for len(retiredOps) < 2 {
+			retiredOps = append(retiredOps, notOp)
+		}
+
 		// remove the active ops
 		delete(active, cycle)
+
 		// find each op in the active list that retires
 		for _, retiredOp := range retiredOps {
+			schedule = append(schedule, retiredOps)
 			// check for each op that that relies on this retired op
 			for _, d := range retiredOp.ReverseEdges {
-				// TODO: check if this applies to all edges or just specific edges
 				// skip nodes already added to ready
 				if d.To.Status != NOT_READY {
 					continue
@@ -81,6 +100,7 @@ func (s *scheduler) Schedule() {
 				d.To.Status = READY
 			}
 		}
-
 	}
+
+	return schedule
 }

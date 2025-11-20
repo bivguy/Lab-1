@@ -4,7 +4,7 @@ import (
 	m "github.com/bivguy/Comp412/models"
 )
 
-var dependenceGraphs = []*DependenceGraph{
+var DEPENDENCE_GRAPHS = []*DependenceGraph{
 	func() *DependenceGraph {
 		// a=1, b=2, c=3, d=4, e=5, f=6, g=7, h=8, i=9
 		a := makeNode(1, "load")  // loadAI rARP,@a => r1
@@ -36,5 +36,5 @@ var dependenceGraphs = []*DependenceGraph{
 		gph.ConnectNodes(i, g, m.SERIALIZATION)
 
 		return gph
-	}(), // <-- note the () to call the func
+	}(),
 }

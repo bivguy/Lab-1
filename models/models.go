@@ -40,14 +40,36 @@ type OperationNode struct {
 }
 
 func (op OperationNode) String() string {
-	return fmt.Sprintf(
-		"Line %d: OpCode: %s; Operand One: %v; Operand Two: %v; Operand Three: %v",
-		op.Line,
-		op.Opcode,
-		op.OpOne,
-		op.OpTwo,
-		op.OpThree,
-	)
+	switch op.Opcode {
+	// ARITH (two uses, one def)
+	case "add", "mult", "sub", "lshift", "rshift": // add rA,rB => rC
+		return fmt.Sprintf("%s r%d,r%d => r%d",
+			op.Opcode, op.OpOne.VR, op.OpTwo.VR, op.OpThree.VR)
+
+	// LOAD variants
+	case "load": // load rAddr => rDst
+		return fmt.Sprintf("load r%d => r%d",
+			op.OpOne.VR, op.OpThree.VR)
+
+	case "loadI":
+		return fmt.Sprintf("loadI %d => r%d",
+			op.OpOne.SR, op.OpThree.VR)
+
+	// STORE (two uses, no def)
+	case "store": // store rVal => rAddr
+		return fmt.Sprintf("store r%d => r%d",
+			op.OpOne.VR, op.OpThree.VR)
+
+	// OUTPUT
+	case "output": // output => rX
+		return fmt.Sprintf("output => %d", op.OpThree.SR)
+
+	// NOP
+	case "nop":
+		return fmt.Sprintf("nop")
+	default:
+		return fmt.Sprintf("%s ???", op.Opcode)
+	}
 }
 
 type Status int

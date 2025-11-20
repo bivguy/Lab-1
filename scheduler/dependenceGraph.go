@@ -8,10 +8,11 @@ import (
 )
 
 type DependenceGraph struct {
-	graph     map[int]*m.DependenceNode
-	DGraph    map[int]*m.DependenceNode
-	leafNodes []*m.DependenceNode
-	maxLine   int
+	graph           map[int]*m.DependenceNode
+	DGraph          map[int]*m.DependenceNode
+	leafNodes       []*m.DependenceNode
+	maxLine         int
+	maxTotalLatency int
 }
 
 func NewDependenceNode(op *m.OperationNode) *m.DependenceNode {
