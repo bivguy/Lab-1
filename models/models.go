@@ -50,12 +50,15 @@ func (op OperationNode) String() string {
 	)
 }
 
+type Status int
+
 type DependenceNode struct {
 	Op           *OperationNode
 	Edges        map[int]*DependenceEdge
+	ReverseEdges map[int]*DependenceEdge
 	TotalLatency int
-	// ConflictEdges      map[int]*DependenceNode
-	// SerializationEdges map[int]*DependenceNode
+	Latency      int
+	Status       Status
 }
 
 type EdgeType int

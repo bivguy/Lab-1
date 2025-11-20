@@ -14,11 +14,11 @@ func computePriority(graph *DependenceGraph) {
 	}
 
 	// fmt.Println("About to do DFS")
-	dfs(startNode, 0, m.DATA)
+	graph.dfs(startNode, 0, m.DATA)
 	// fmt.Println("Finished DFS")
 }
 
-func dfs(node *m.DependenceNode, incomingLatency int, edgeType m.EdgeType) {
+func (g *DependenceGraph) dfs(node *m.DependenceNode, incomingLatency int, edgeType m.EdgeType) {
 	// fmt.Println("Doing DFS for line ", node.Op.Line)
 	curTotalLatency := incomingLatency + computeLatency(node, edgeType)
 	// check if this node has already been visited (unvisited means node latency is 0)
@@ -28,6 +28,13 @@ func dfs(node *m.DependenceNode, incomingLatency int, edgeType m.EdgeType) {
 
 	// means this node is unvisited
 	node.TotalLatency = curTotalLatency
+	node.Latency = computeLatency(node, edgeType)
+
+	// check if this is a leaf node if it has 0 outgoing edges
+	if len(node.Edges) == 0 {
+		g.leafNodes = append(g.leafNodes, node)
+		return
+	}
 
 	// traverse the other nodes
 	for _, edge := range node.Edges {
@@ -35,6 +42,6 @@ func dfs(node *m.DependenceNode, incomingLatency int, edgeType m.EdgeType) {
 		if nextNode == node { // defensive: no self-loop traversal
 			continue
 		}
-		dfs(nextNode, node.TotalLatency, edge.Type)
+		g.dfs(nextNode, node.TotalLatency, edge.Type)
 	}
 }

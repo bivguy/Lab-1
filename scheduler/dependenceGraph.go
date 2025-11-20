@@ -8,15 +8,18 @@ import (
 )
 
 type DependenceGraph struct {
-	graph   map[int]*m.DependenceNode
-	DGraph  map[int]*m.DependenceNode
-	maxLine int
+	graph     map[int]*m.DependenceNode
+	DGraph    map[int]*m.DependenceNode
+	leafNodes []*m.DependenceNode
+	maxLine   int
 }
 
 func NewDependenceNode(op *m.OperationNode) *m.DependenceNode {
 	return &m.DependenceNode{
-		Op:    op,
-		Edges: make(map[int]*m.DependenceEdge),
+		Op:           op,
+		Edges:        make(map[int]*m.DependenceEdge),
+		ReverseEdges: make(map[int]*m.DependenceEdge),
+		Status:       NOT_READY,
 	}
 }
 
@@ -47,6 +50,7 @@ func computeLatency(node *m.DependenceNode, edgeType m.EdgeType) int {
 	}
 }
 
+// TODO: add in the reverse edges
 func (g *DependenceGraph) ConnectNodes(in *m.DependenceNode, out *m.DependenceNode, edgeType m.EdgeType) {
 	// line := in.Op.Line
 	edge := &m.DependenceEdge{
@@ -57,6 +61,15 @@ func (g *DependenceGraph) ConnectNodes(in *m.DependenceNode, out *m.DependenceNo
 
 	// connect the edge where the node is defined to the node where it is used (definition -> use) by mapping the line number to the node
 	in.Edges[out.Op.Line] = edge
+
+	reverseEdge := &m.DependenceEdge{
+		To:      in,
+		Type:    edgeType,
+		Latency: computeLatency(out, edgeType),
+	}
+
+	// connect this to the opposite node as well
+	out.ReverseEdges[in.Op.Line] = reverseEdge
 
 	// fmt.Printf("line %d has edge to line %d \n", in.Op.Line, out.Op.Line)
 }

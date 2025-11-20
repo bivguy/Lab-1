@@ -18,6 +18,12 @@ type PriorityTestCase struct {
 	expected    map[int]int
 }
 
+type SchedulerTestCase struct {
+	description string
+	graph       *DependenceGraph
+	expected    *list.List
+}
+
 func createOperand(VR int) m.Operand {
 	return m.Operand{
 		SR:     -1,
@@ -210,6 +216,12 @@ var simplePriorityTestCases = []PriorityTestCase{
 			8: 9,
 			9: 6,
 		},
+	},
+}
+
+var simpleSchedulerTestCases = []SchedulerTestCase{
+	{
+		description: "simple scheduler test case",
 	},
 }
 
