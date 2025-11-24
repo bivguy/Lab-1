@@ -110,4 +110,8 @@ r2rename: clean-build
 ag2: clean-build
 	./$(BIN) 3 test_files/report2.i
 
+# lab 3
+easySched: clean-build
+	./$(BIN) test_files/superEasySched.txt
+
 

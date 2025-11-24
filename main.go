@@ -17,9 +17,6 @@ import (
 
 func main() {
 	hFlag := flag.Bool("h", false, "Display help")
-	// sFlag := flag.Bool("s", false, "Display the Scanner Output")
-	// pFlag := flag.Bool("p", false, "Display the Parser Output")
-	// rFlag := flag.Bool("r", false, "Display the Intermediate Representation Output")
 
 	xFlag := flag.Bool("x", false, "Displays the Renamed Intermediate Representation Output")
 
@@ -80,8 +77,7 @@ func main() {
 
 	// if neither the xFlag or the hFlag are provided, schedule on the input file passed in
 	scheduler := scheduler.NewSchedule(renamedIR)
-	scheduledBlocks := scheduler.Schedule()
-	printSchedule(scheduledBlocks)
+	scheduler.PrintSchedule()
 }
 
 // helpMessage prints to the command line all the possible commands for the 412fe applications
@@ -138,3 +134,13 @@ func printSchedule(scheduledBlocks [][]*m.DependenceNode) {
 
 	fmt.Println(b.String())
 }
+
+// below is the renamed output for ex1.txt to add two numbers
+
+// loadI 314 => r2
+// loadI 0 => r4
+// load r4 => r3
+// add r2,r3 => r0
+// loadI 0 => r1
+// store r0 => r1
+// output => 0

@@ -53,7 +53,9 @@ func computeLatency(node *m.DependenceNode, edgeType m.EdgeType) int {
 
 // TODO: add in the reverse edges
 func (g *DependenceGraph) ConnectNodes(in *m.DependenceNode, out *m.DependenceNode, edgeType m.EdgeType) {
-	// line := in.Op.Line
+	if DEBUG_DEPENDENCE_GRAPH {
+		fmt.Println("Connecting line", in.Op.Line, "to line", out.Op.Line, "with edge type", edgeType.String())
+	}
 	edge := &m.DependenceEdge{
 		To:      out,
 		Type:    edgeType,
@@ -82,6 +84,7 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 
 	var line int
 	for node := IR.Front(); node != nil; node = node.Next() {
+
 		op := node.Value.(*m.OperationNode)
 		opCode := op.Opcode
 
@@ -90,6 +93,7 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 		}
 
 		line = op.Line
+		fmt.Println("At line ", line, " with opcode ", opCode)
 
 		// create a node for this operation
 		node := NewDependenceNode(op)
@@ -117,21 +121,24 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 
 			// add an edge from the definition node to this use node
 			if defNode, exists := g.graph[o.VR]; exists {
-				g.ConnectNodes(defNode, node, m.DATA)
+				fmt.Println("Connecting the node with a dataEdge")
+				g.ConnectNodes(node, defNode, m.DATA)
 			}
 		}
 
 		// load & output need an edge to the most recent store
 		if opCode == "load" || opCode == "output" {
 			if mostRecentStore != nil {
-				g.ConnectNodes(mostRecentStore, node, m.CONFLICT)
+				fmt.Println("Connecting the load or output at line", line, "to most recent store at line", mostRecentStore.Op.Line)
+				g.ConnectNodes(node, mostRecentStore, m.CONFLICT)
 			}
 		}
 
 		// output needs an edge to the most recent output
 		if opCode == "output" {
 			if mostRecentOutput != nil {
-				g.ConnectNodes(mostRecentOutput, node, m.SERIALIZATION)
+				fmt.Println("Connecting output at line", line, "to most recent output at line", mostRecentOutput.Op.Line)
+				g.ConnectNodes(node, mostRecentOutput, m.SERIALIZATION)
 			}
 		}
 
@@ -139,14 +146,14 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 		if opCode == "store" {
 			if mostRecentStore != nil {
 				fmt.Println("Connecting store at line", line, "to most recent store at line", mostRecentStore.Op.Line)
-				g.ConnectNodes(mostRecentStore, node, m.SERIALIZATION)
+				g.ConnectNodes(node, mostRecentStore, m.SERIALIZATION)
 			}
 
 			// connect this store to all previous reads (store -> read)
 			// TODO: optimize this later to remove redundant serialization edges
 			for _, readNode := range previousReads {
 				fmt.Println("Connecting store at line", line, "to previous read at line", readNode.Op.Line)
-				g.ConnectNodes(readNode, node, m.SERIALIZATION)
+				g.ConnectNodes(node, readNode, m.SERIALIZATION)
 			}
 
 			// reset the previous reads
@@ -166,6 +173,7 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 	}
 
 	g.maxLine = line
+	fmt.Println("finished making dependence graph")
 
 	return g.DGraph
 }

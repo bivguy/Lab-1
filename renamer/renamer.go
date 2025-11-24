@@ -63,26 +63,26 @@ func (r *renamer) Rename() *list.List {
 
 		// same logic as definition (loadI)
 
-		if op.Opcode == "loadI" {
-			o1 := &op.OpOne
-			o3 := &op.OpThree
+		// if op.Opcode == "loadI" {
+		// 	o1 := &op.OpOne
+		// 	o3 := &op.OpThree
 
-			if r.SRToVR[o3.SR] == -1 {
-				r.SRToVR[o3.SR] = vrName
-				vrName++
-			}
-			o3.VR = r.SRToVR[o3.SR]
-			o3.NU = r.LU[o3.SR]
+		// 	if r.SRToVR[o3.SR] == -1 {
+		// 		r.SRToVR[o3.SR] = vrName
+		// 		vrName++
+		// 	}
+		// 	o3.VR = r.SRToVR[o3.SR]
+		// 	o3.NU = r.LU[o3.SR]
 
-			r.VRToConstant[o3.VR] = o1.SR
+		// 	r.VRToConstant[o3.VR] = o1.SR
 
-			r.SRToVR[o3.SR] = -1
-			r.LU[o3.SR] = math.Inf(1)
+		// 	r.SRToVR[o3.SR] = -1
+		// 	r.LU[o3.SR] = math.Inf(1)
 
-			// mark this node for deletion
-			r.deletePrevNode = true
-			continue
-		}
+		// 	// mark this node for deletion
+		// 	r.deletePrevNode = true
+		// 	continue
+		// }
 
 		operandList := []*m.Operand{&op.OpOne, &op.OpTwo, &op.OpThree}
 
@@ -139,12 +139,12 @@ func (r *renamer) Rename() *list.List {
 		r.index--
 	}
 
-	node := r.IR.Front()
-	op := node.Value.(*m.OperationNode)
+	// node := r.IR.Front()
+	// op := node.Value.(*m.OperationNode)
 
-	if op.Opcode == "loadI" {
-		r.IR.Remove(node)
-	}
+	// if op.Opcode == "loadI" {
+	// 	r.IR.Remove(node)
+	// }
 
 	// fmt.Printf("VR to Constant", r.VRToConstant, "\n")
 	return r.IR

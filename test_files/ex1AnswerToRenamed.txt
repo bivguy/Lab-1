@@ -1,0 +1,7 @@
+// loadI 314 => r2
+// loadI 0 => r4
+// load r4 => r3
+// add r2,r3 => r0
+// loadI 0 => r1
+// store r0 => r1
+// output => 0
