@@ -74,6 +74,14 @@ func (s *scheduler) Schedule() []*operationBlock {
 	cycle := 1
 
 	for len(ready) > 0 || len(active) > 0 {
+		if DEBUG_SCHEDULING {
+			fmt.Println("Length of ready is ", len(ready), " and length of active is ", len(active))
+			if len(active) == 1 && len(ready) == 0 {
+				for k, v := range active {
+					fmt.Println("active key is ", k, " with value length ", len(v), " and opcode ", v[0].Op.Opcode, " at line ", v[0].Op.Line)
+				}
+			}
+		}
 		skipped := []*m.DependenceNode{}
 		opBlock := &operationBlock{
 			operationOne: notOp,
@@ -117,8 +125,10 @@ func (s *scheduler) Schedule() []*operationBlock {
 			default:
 				if opBlock.operationTwo.Op.Opcode == "nop" {
 					opBlock.operationTwo = dn
+					numIssued += 1
 				} else if opBlock.operationOne.Op.Opcode == "nop" {
 					opBlock.operationOne = dn
+					numIssued += 1
 				} else {
 					fmt.Println("ERROR: both slots taken when they shouldn't be")
 					numIssued = 2
@@ -127,8 +137,13 @@ func (s *scheduler) Schedule() []*operationBlock {
 			}
 
 			// pick an operation from each functional unit
-			removeIndex := cycle + dn.Latency
-
+			removeIndex := cycle + computeLatency(dn, m.DATA)
+			if DEBUG_SCHEDULING {
+				if removeIndex <= cycle {
+					fmt.Println("ERROR: remove index ", removeIndex, " is less than or equal to current cycle ", cycle)
+					fmt.Println("with op ", dn.Op.Opcode, " at line ", dn.Op.Line, " with latency ", dn.Latency)
+				}
+			}
 			// check if we need to make a new slice here
 			_, ok := active[removeIndex]
 			if !ok {
@@ -151,11 +166,11 @@ func (s *scheduler) Schedule() []*operationBlock {
 			heap.Push(&ready, skippedNode)
 		}
 		cycle += 1
+		// if cycle > 110 {
+		// 	return nil
+		// }
 		if DEBUG_SCHEDULING {
 			fmt.Println("cycle is now", cycle)
-		}
-		if cycle > 25 {
-			return nil
 		}
 		retiredOps := active[cycle]
 		for _, retiredOp := range retiredOps {
@@ -169,12 +184,12 @@ func (s *scheduler) Schedule() []*operationBlock {
 		}
 
 		// if there are no retiredOps then we must add a NOP
-		for len(retiredOps) < 2 {
-			if DEBUG_SCHEDULING {
-				fmt.Println("adding nop at cycle ", cycle)
-			}
-			retiredOps = append(retiredOps, notOp)
-		}
+		// for len(retiredOps) < 2 {
+		// 	if DEBUG_SCHEDULING {
+		// 		fmt.Println("adding nop at cycle ", cycle)
+		// 	}
+		// 	retiredOps = append(retiredOps, notOp)
+		// }
 
 		// remove the active ops
 		delete(active, cycle)

@@ -114,4 +114,7 @@ ag2: clean-build
 easySched: clean-build
 	./$(BIN) test_files/easySched.txt
 
+medSched: clean-build
+	./$(BIN) test_files/report05.txt
+
 

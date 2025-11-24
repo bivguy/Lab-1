@@ -35,9 +35,9 @@ func New() *DependenceGraph {
 }
 
 func computeLatency(node *m.DependenceNode, edgeType m.EdgeType) int {
-	if edgeType == m.SERIALIZATION {
-		return 1
-	}
+	// if edgeType == m.SERIALIZATION {
+	// 	return 1
+	// }
 
 	switch node.Op.Opcode {
 	case "load", "store":
@@ -47,7 +47,7 @@ func computeLatency(node *m.DependenceNode, edgeType m.EdgeType) int {
 	case "add", "sub", "lshift", "rshift", "loadI", "output", "nop":
 		return 1
 	default:
-		return -1
+		return 1
 	}
 }
 
@@ -152,7 +152,9 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 		// output needs an edge to the most recent output
 		if opCode == "output" {
 			if mostRecentOutput != nil {
-				fmt.Println("Connecting output at line", line, "to most recent output at line", mostRecentOutput.Op.Line)
+				if DEBUG_DEPENDENCE_GRAPH {
+					fmt.Println("Connecting output at line", line, "to most recent output at line", mostRecentOutput.Op.Line)
+				}
 				g.ConnectNodes(node, mostRecentOutput, m.SERIALIZATION)
 			}
 		}
@@ -160,7 +162,9 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 		// store needs an edge to the most recent store, as well as each previous load & output
 		if opCode == "store" {
 			if mostRecentStore != nil {
-				fmt.Println("Connecting store at line", line, "to most recent store at line", mostRecentStore.Op.Line)
+				if DEBUG_DEPENDENCE_GRAPH {
+					fmt.Println("Connecting store at line", line, "to most recent store at line", mostRecentStore.Op.Line)
+				}
 				g.ConnectNodes(node, mostRecentStore, m.SERIALIZATION)
 			}
 
