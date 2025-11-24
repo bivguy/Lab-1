@@ -82,14 +82,18 @@ func main() {
 
 // helpMessage prints to the command line all the possible commands for the 412fe applications
 func helpMessage() {
-	fmt.Println("Usage: 412fe [flags]")
+	fmt.Println("Usage: schedule [flags]")
 	fmt.Println()
-	fmt.Println("412fe is the front end for the compiler project.")
+	fmt.Println("schedule is the Lab 3 instruction scheduler for the COMP 412 compiler project.")
 	fmt.Println()
 	fmt.Println("Flags:")
 
 	fmt.Println("  -h \t\t Display this help message.")
 	fmt.Println("  -x <filename>\t scans and parse the input block. It should then perform renaming the code in the input block and print the results to the standard output stream.")
+
+	fmt.Println("  <filename>        (No flag.) Schedule the input ILOC code using the Lab 3 scheduler.")
+	fmt.Println("                    The resulting scheduled code is printed to standard output.")
+	fmt.Println()
 
 	fmt.Println("No flag provided: behaves as if -p <filename> was specified.")
 }
