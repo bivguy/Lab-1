@@ -56,6 +56,16 @@ func (g *DependenceGraph) ConnectNodes(in *m.DependenceNode, out *m.DependenceNo
 	if DEBUG_DEPENDENCE_GRAPH {
 		fmt.Println("Connecting line", in.Op.Line, "to line", out.Op.Line, "with edge type", edgeType.String())
 	}
+
+	// don't connect a node to another node if there's already another edge to this node of a higher latency
+	if existingEdge, exists := in.Edges[out.Op.Line]; exists {
+		if existingEdge.Latency >= computeLatency(in, edgeType) {
+			if DEBUG_DEPENDENCE_GRAPH {
+				fmt.Println("Edge from line", in.Op.Line, "to line", out.Op.Line, "already exists as a ", existingEdge.Type, " edge with latency ", existingEdge.Latency, " latency. Skipping ", edgeType, " connection.")
+			}
+			return
+		}
+	}
 	edge := &m.DependenceEdge{
 		To:      out,
 		Type:    edgeType,

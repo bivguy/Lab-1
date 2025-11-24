@@ -112,6 +112,6 @@ ag2: clean-build
 
 # lab 3
 easySched: clean-build
-	./$(BIN) test_files/superEasySched.txt
+	./$(BIN) test_files/easySched.txt
 
 
