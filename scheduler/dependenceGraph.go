@@ -103,8 +103,9 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 		}
 
 		line = op.Line
-		fmt.Println("At line ", line, " with opcode ", opCode)
-
+		if DEBUG_DEPENDENCE_GRAPH {
+			fmt.Println("At line ", line, " with opcode ", opCode)
+		}
 		// create a node for this operation
 		node := NewDependenceNode(op)
 
@@ -131,7 +132,9 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 
 			// add an edge from the definition node to this use node
 			if defNode, exists := g.graph[o.VR]; exists {
-				fmt.Println("Connecting the node with a dataEdge")
+				if DEBUG_DEPENDENCE_GRAPH {
+					fmt.Println("Connecting the node with a dataEdge")
+				}
 				g.ConnectNodes(node, defNode, m.DATA)
 			}
 		}
@@ -139,7 +142,9 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 		// load & output need an edge to the most recent store
 		if opCode == "load" || opCode == "output" {
 			if mostRecentStore != nil {
-				fmt.Println("Connecting the load or output at line", line, "to most recent store at line", mostRecentStore.Op.Line)
+				if DEBUG_DEPENDENCE_GRAPH {
+					fmt.Println("Connecting the load or output at line", line, "to most recent store at line", mostRecentStore.Op.Line)
+				}
 				g.ConnectNodes(node, mostRecentStore, m.CONFLICT)
 			}
 		}
@@ -162,7 +167,9 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 			// connect this store to all previous reads (store -> read)
 			// TODO: optimize this later to remove redundant serialization edges
 			for _, readNode := range previousReads {
-				fmt.Println("Connecting store at line", line, "to previous read at line", readNode.Op.Line)
+				if DEBUG_DEPENDENCE_GRAPH {
+					fmt.Println("Connecting store at line", line, "to previous read at line", readNode.Op.Line)
+				}
 				g.ConnectNodes(node, readNode, m.SERIALIZATION)
 			}
 
@@ -183,7 +190,9 @@ func (g *DependenceGraph) CreateDependenceGraph(IR *list.List) map[int]*m.Depend
 	}
 
 	g.maxLine = line
-	fmt.Println("finished making dependence graph")
+	if DEBUG_DEPENDENCE_GRAPH {
+		fmt.Println("finished making dependence graph")
+	}
 
 	return g.DGraph
 }

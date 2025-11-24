@@ -15,26 +15,33 @@ func computePriority(graph *DependenceGraph) {
 		return
 	}
 	seen := make(map[int]bool)
-	fmt.Println("About to do DFS on node of opCode ", startNode.Op.Opcode)
+	if DEBUG_PRIORITY_COMPUTATION {
+		fmt.Println("About to do DFS on node of opCode ", startNode.Op.Opcode)
+	}
 	graph.dfs(startNode, 0, m.DATA, seen)
-	fmt.Println("Finished DFS")
 }
 
 func (g *DependenceGraph) dfs(node *m.DependenceNode, incomingLatency int, edgeType m.EdgeType, seen map[int]bool) {
 	curLine := node.Op.Line
 	// skip if already seen
 	if seen[curLine] {
-		fmt.Println("alrady seen line ", curLine)
+		if DEBUG_PRIORITY_COMPUTATION {
+			fmt.Println("alrady seen line ", curLine)
+		}
 		return
 	}
 
 	seen[curLine] = true
-	fmt.Println("doing DFS on line ", curLine, " with", len(node.Edges), " neighbors")
+	if DEBUG_PRIORITY_COMPUTATION {
+		fmt.Println("doing DFS on line ", curLine, " with", len(node.Edges), " neighbors")
+	}
 	// fmt.Println("Doing DFS for line ", node.Op.Line)
 	curTotalLatency := incomingLatency + computeLatency(node, edgeType)
 	// check if this node has already been visited (unvisited means node latency is 0)
 	if node.TotalLatency != 0 && node.TotalLatency >= curTotalLatency {
-		fmt.Println("already visisted line ", node.Op.Line)
+		if DEBUG_PRIORITY_COMPUTATION {
+			fmt.Println("already visisted line ", node.Op.Line)
+		}
 		return
 	}
 
@@ -46,13 +53,17 @@ func (g *DependenceGraph) dfs(node *m.DependenceNode, incomingLatency int, edgeT
 	// TOOD: this reverse edge check might be wrong
 	if len(node.Edges) == 0 {
 		g.leafNodes = append(g.leafNodes, node)
-		fmt.Println("adding the leaf node of line ", node.Op.Line)
+		if DEBUG_PRIORITY_COMPUTATION {
+			fmt.Println("adding the leaf node of line ", node.Op.Line)
+		}
 	}
 
 	// traverse the other nodes
 	for nextNodeLine, edge := range node.Edges {
 		nextNode := edge.To
-		fmt.Println("about to go to node of line ", nextNodeLine)
+		if DEBUG_PRIORITY_COMPUTATION {
+			fmt.Println("about to go to node of line ", nextNodeLine)
+		}
 
 		if nextNodeLine == node.Op.Line { // no self-loop traversal
 			continue

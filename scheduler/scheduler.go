@@ -9,9 +9,9 @@ import (
 	m "github.com/bivguy/Comp412/models"
 )
 
-const DEBUG_DEPENDENCE_GRAPH = true
-const DEBUG_PRIORITY_COMPUTATION = true
-const DEBUG_SCHEDULING = true
+const DEBUG_DEPENDENCE_GRAPH = false
+const DEBUG_PRIORITY_COMPUTATION = false
+const DEBUG_SCHEDULING = false
 
 const (
 	NOT_READY m.Status = iota // 0
@@ -115,10 +115,10 @@ func (s *scheduler) Schedule() []*operationBlock {
 				numIssued += 1
 			// all other operations can go in either slot
 			default:
-				if opBlock.operationOne.Op.Opcode == "nop" {
-					opBlock.operationOne = dn
-				} else if opBlock.operationTwo.Op.Opcode == "nop" {
+				if opBlock.operationTwo.Op.Opcode == "nop" {
 					opBlock.operationTwo = dn
+				} else if opBlock.operationOne.Op.Opcode == "nop" {
+					opBlock.operationOne = dn
 				} else {
 					fmt.Println("ERROR: both slots taken when they shouldn't be")
 					numIssued = 2
@@ -163,12 +163,16 @@ func (s *scheduler) Schedule() []*operationBlock {
 		}
 
 		if len(retiredOps) > 0 {
-			fmt.Println("deleted the ops of length ", len(retiredOps))
+			if DEBUG_SCHEDULING {
+				fmt.Println("deleted the ops of length ", len(retiredOps))
+			}
 		}
 
 		// if there are no retiredOps then we must add a NOP
 		for len(retiredOps) < 2 {
-			fmt.Println("adding nop at cycle ", cycle)
+			if DEBUG_SCHEDULING {
+				fmt.Println("adding nop at cycle ", cycle)
+			}
 			retiredOps = append(retiredOps, notOp)
 		}
 
@@ -181,8 +185,9 @@ func (s *scheduler) Schedule() []*operationBlock {
 			if retiredOp.Op.Opcode == "nop" {
 				continue
 			}
-			fmt.Println("about to retired the op ", retiredOp.Op.Opcode, " of line ", retiredOp.Op.Line)
-
+			if DEBUG_SCHEDULING {
+				fmt.Println("about to retired the op ", retiredOp.Op.Opcode, " of line ", retiredOp.Op.Line)
+			}
 			// check for each op that that relies on this retired op
 			for _, d := range retiredOp.ReverseEdges {
 				// skip nodes already added to ready
@@ -207,8 +212,9 @@ func (s *scheduler) Schedule() []*operationBlock {
 		}
 	}
 
-	fmt.Println("length of scheduler: ", len(schedule))
-
+	if DEBUG_SCHEDULING {
+		fmt.Println("length of scheduler: ", len(schedule))
+	}
 	return schedule
 }
 

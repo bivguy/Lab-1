@@ -1,5 +1,5 @@
 # ---- config ----
-BIN := 412alloc          # The executable name the autograder expects
+BIN := schedule          # The executable name the autograder expects
 PKG ?= .                  # Go package to build (default for this is current directory)
 NETID ?= bs81
 TARFILE ?= ../$(NETID).tar
