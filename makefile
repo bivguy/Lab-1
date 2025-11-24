@@ -115,6 +115,18 @@ easySched: clean-build
 	./$(BIN) test_files/easySched.txt
 
 medSched: clean-build
-	./$(BIN) test_files/report05.txt
+	./$(BIN) test_files/report04.txt
+
+sched4: clean-build
+	./$(BIN) test_files/report04.i
+
+sched5: clean-build
+	./$(BIN) test_files/report05.i
+
+sched6: clean-build
+	./$(BIN) test_files/report06.i
+
+sched16: clean-build
+	./$(BIN) test_files/report16.i
 
 

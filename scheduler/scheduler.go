@@ -166,7 +166,7 @@ func (s *scheduler) Schedule() []*operationBlock {
 			heap.Push(&ready, skippedNode)
 		}
 		cycle += 1
-		// if cycle > 50 {
+		// if cycle > 75 {
 		// 	return nil
 		// }
 		if DEBUG_SCHEDULING {
@@ -220,40 +220,49 @@ func (s *scheduler) Schedule() []*operationBlock {
 
 		// go through each multicycle op in active and see if there are any early releases we can do
 		// TODO: this part can be optimized
-		// for _, ops := range active {
-		// 	for _, dn := range ops {
-		// 		// examine each load and store
-		// 		opCode := dn.Op.Opcode
-		// 		if opCode == "load" || opCode == "store" {
-		// 			// check ops that depend on this current operation an early release
-		// 			for _, edge := range dn.ReverseEdges {
-		// 				// skip all nodes that aren't connected by a serial edge
-		// 				if edge.Type != m.SERIALIZATION {
-		// 					continue
-		// 				}
-		// 				// an early release candidate
-		// 				candidate := edge.To
-		// 				// now we must check that all of this node's other dependencies are also satisfied
-		// 				valid := true
-		// 				for _, candidateEdge := range candidate.Edges {
-		// 					// if the node connected via serial edge is not ready or if the node connected by other edge is not retired, we can't do an early release
-		// 					if (candidateEdge.Type == m.SERIALIZATION && candidateEdge.To.Status == NOT_READY) ||
-		// 						(candidateEdge.Type != m.SERIALIZATION && candidateEdge.To.Status != RETIRED) {
-		// 						valid = false
-		// 						break
-		// 					}
-		// 				}
+		for _, ops := range active {
+			for _, dn := range ops {
+				// examine each load and store
+				opCode := dn.Op.Opcode
+				if opCode == "load" || opCode == "store" {
+					// check ops that depend on this current operation an early release
+					for _, edge := range dn.ReverseEdges {
+						// skip all nodes that aren't connected by a serial edge
+						if edge.Type != m.SERIALIZATION {
+							continue
+						}
+						// an early release candidate
+						candidate := edge.To
+						// already has been used in some way
+						if candidate.Status != NOT_READY {
+							continue
+						}
+						// now we must check that all of this node's other dependencies are also satisfied
+						valid := true
+						for _, candidateEdge := range candidate.Edges {
+							if candidateEdge.Type == m.SERIALIZATION {
+								// node connected via serial edge is not ready
+								if candidateEdge.To.Status == NOT_READY {
+									valid = false
+									break
+								}
+								// node connected by other edge is not retired, we can't do an early release
+							} else if candidateEdge.To.Status != RETIRED {
+								valid = false
+								break
+							}
+						}
 
-		// 				// this node can be set as ready via early release
-		// 				if valid {
-		// 					heap.Push(&ready, candidate)
-		// 					candidate.Status = READY
-		// 				}
-		// 			}
-		// 		}
+						// this node can be set as ready via early release
+						if valid {
+							heap.Push(&ready, candidate)
+							candidate.Status = READY
+						}
+					}
+				}
 
-		// 	}
-		// }
+			}
+		}
 	}
 
 	if DEBUG_SCHEDULING {

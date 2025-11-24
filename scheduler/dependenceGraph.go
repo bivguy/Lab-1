@@ -35,9 +35,9 @@ func New() *DependenceGraph {
 }
 
 func computeLatency(node *m.DependenceNode, edgeType m.EdgeType) int {
-	// if edgeType == m.SERIALIZATION {
-	// 	return 1
-	// }
+	if edgeType == m.SERIALIZATION {
+		return 1
+	}
 
 	switch node.Op.Opcode {
 	case "load", "store":
